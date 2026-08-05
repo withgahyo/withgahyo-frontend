@@ -1,5 +1,7 @@
+import AuthLandingScene from '../../features/auth/components/AuthLandingScene'
+
 function LoginPage() {
-  return <h1>Login</h1>
+  return <AuthLandingScene stage="buttonsIn" />
 }
 
 export default LoginPage
