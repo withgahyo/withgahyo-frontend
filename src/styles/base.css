@@ -1,0 +1,34 @@
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--font-sans);
+  background-color: var(--color-app-backdrop);
+  color: var(--color-ink);
+}
+
+::selection {
+  background-color: var(--color-brand-lime);
+  color: var(--color-ink);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(20, 20, 43, 0.2);
+  border-radius: 9999px;
+}
+
+/* 100dvh 미지원 브라우저를 위한 100vh 폴백 (선언 순서로 캐스케이드 적용) */
+.min-h-app {
+  min-height: 100vh;
+  min-height: 100dvh;
+}

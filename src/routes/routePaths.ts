@@ -1,0 +1,32 @@
+export const ROUTE_PATHS = {
+  splash: '/splash',
+  login: '/login',
+
+  onboardingDuration: '/onboarding/duration',
+  onboardingTourism: '/onboarding/tourism',
+  onboardingFood: '/onboarding/food',
+  onboardingCondition: '/onboarding/condition',
+  onboardingComplete: '/onboarding/complete',
+
+  home: '/home',
+  popular: '/popular',
+  albums: '/albums',
+  mypage: '/mypage',
+
+  courseCreateRegion: '/courses/create/region',
+  courseCreateDate: '/courses/create/date',
+  courseCreateFamily: '/courses/create/family',
+  courseCreateKeywords: '/courses/create/keywords',
+  courseCreatePlaces: '/courses/create/places',
+  courseCreateConfirm: '/courses/create/confirm',
+
+  courseGenerating: (generationId: string) =>
+    `/courses/generating/${generationId}`,
+  courseRecommendations: (generationId: string) =>
+    `/courses/recommendations/${generationId}`,
+  courseDetail: (courseId: string) => `/courses/${courseId}`,
+
+  albumDetail: (albumId: string) => `/albums/${albumId}`,
+  notifications: '/notifications',
+  review: (courseId: string) => `/reviews/${courseId}`,
+} as const

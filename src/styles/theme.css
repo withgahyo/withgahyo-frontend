@@ -1,0 +1,22 @@
+@theme {
+  /* Color */
+  --color-brand-blue: #3044ff;
+  --color-brand-lime: #d7ff64;
+  --color-ink: #14142b;
+  --color-app-backdrop: #e9eaf2;
+
+  /* Font */
+  --font-sans:
+    'Pretendard Variable', -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', sans-serif;
+
+  /* Font Size (일반 UI 텍스트, 로고/워드마크 제외) */
+  --text-heading: 1.375rem; /* 22px */
+  --text-caption: 0.75rem; /* 12px */
+
+  /* Border Radius */
+  --radius-card: 1.75rem; /* 28px */
+
+  /* Shadow */
+  --shadow-fab: 0 8px 20px -4px rgb(48 68 255 / 0.35);
+}
