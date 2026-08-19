@@ -2,6 +2,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-width: none;
 }
 
 body {
@@ -17,14 +18,10 @@ body {
   color: var(--color-ink);
 }
 
+/* 모바일 앱처럼 스크롤바를 노출하지 않는다 (가로 스크롤 캐러셀 등 컴포넌트 단위
+   스크롤바 숨김 정책과 동일하게 앱 전체 페이지 스크롤에도 적용) */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(20, 20, 43, 0.2);
-  border-radius: 9999px;
+  display: none;
 }
 
 /* 100dvh 미지원 브라우저를 위한 100vh 폴백 (선언 순서로 캐스케이드 적용) */
