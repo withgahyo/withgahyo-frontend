@@ -30,7 +30,7 @@ function OnboardingDurationPage() {
         description="부모님과 함께할 여행 일정을 정해볼까요?"
       />
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-6 flex flex-col gap-4">
         {DURATION_OPTIONS.map((option) => {
           const isSelected = durationId === option.id
           return (
@@ -39,10 +39,8 @@ function OnboardingDurationPage() {
               type="button"
               aria-pressed={isSelected}
               onClick={() => setDuration(option.id)}
-              className={`relative flex w-full items-center gap-4 rounded-card border-2 p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
-                isSelected
-                  ? 'border-brand-blue bg-brand-lime'
-                  : 'border-transparent bg-gray-100'
+              className={`relative flex w-full items-center gap-4 rounded-card border-transparent p-5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
+                isSelected ? 'bg-brand-lime' : 'bg-gray-200'
               }`}
             >
               {/* TODO: 실제 브랜드 아이콘 asset 준비되면 Calendar 아이콘 교체 */}
@@ -50,12 +48,8 @@ function OnboardingDurationPage() {
                 <Calendar size={22} aria-hidden="true" />
               </span>
               <span className="flex-1">
-                <span className="block text-base font-bold text-ink">
-                  {option.title}
-                </span>
-                <span className="mt-1 block text-sm text-ink/60">
-                  {option.description}
-                </span>
+                <span className="block text-base font-bold text-ink">{option.title}</span>
+                <span className="mt-1 block text-sm text-ink/60">{option.description}</span>
               </span>
               {isSelected && (
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-blue text-white">
