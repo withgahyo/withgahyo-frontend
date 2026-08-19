@@ -6,6 +6,7 @@ import SelectChip from '../../components/common/SelectChip'
 import OnboardingHeading from '../../features/onboarding/components/OnboardingHeading'
 import OnboardingStepLayout from '../../features/onboarding/components/OnboardingStepLayout'
 import {
+  BURDENSOME_FOOD_OPTIONS,
   FACILITY_OPTIONS,
   MEAL_CAUTION_OPTIONS,
   REST_NEED_OPTIONS,
@@ -25,6 +26,40 @@ interface ConditionGroupProps {
   onSelect: (id: string) => void
 }
 
+function isChoiceSelected(selected: string | string[], id: string) {
+  return Array.isArray(selected) ? selected.includes(id) : selected === id
+}
+
+interface ConditionChipRowProps {
+  subtitle?: string
+  options: ConditionChoice[]
+  selected: string | string[]
+  onSelect: (id: string) => void
+}
+
+function ConditionChipRow({
+  subtitle,
+  options,
+  selected,
+  onSelect,
+}: ConditionChipRowProps) {
+  return (
+    <div>
+      {subtitle && <p className="mb-2 text-xs text-ink/50">{subtitle}</p>}
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => (
+          <SelectChip
+            key={option.id}
+            label={option.label}
+            selected={isChoiceSelected(selected, option.id)}
+            onClick={() => onSelect(option.id)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ConditionGroup({
   icon: Icon,
   title,
@@ -33,26 +68,18 @@ function ConditionGroup({
   selected,
   onSelect,
 }: ConditionGroupProps) {
-  const isSelected = (id: string) =>
-    Array.isArray(selected) ? selected.includes(id) : selected === id
-
   return (
     <div role="group" aria-label={title}>
       <div className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-ink">
         <Icon size={16} aria-hidden="true" />
         <span>{title}</span>
       </div>
-      {subtitle && <p className="-mt-1.5 mb-2 text-xs text-ink/50">{subtitle}</p>}
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <SelectChip
-            key={option.id}
-            label={option.label}
-            selected={isSelected(option.id)}
-            onClick={() => onSelect(option.id)}
-          />
-        ))}
-      </div>
+      <ConditionChipRow
+        subtitle={subtitle}
+        options={options}
+        selected={selected}
+        onSelect={onSelect}
+      />
     </div>
   )
 }
@@ -65,11 +92,13 @@ function OnboardingConditionPage() {
     stairsToleranceId,
     facilityIds,
     mealCautionId,
+    burdensomeFoodIds,
     setWalkingTime,
     setRestNeed,
     setStairsTolerance,
     toggleFacility,
     setMealCaution,
+    toggleBurdensomeFood,
   } = useOnboardingStore((state) => state)
 
   const handleNext = () => {
@@ -123,14 +152,26 @@ function OnboardingConditionPage() {
           selected={facilityIds}
           onSelect={toggleFacility}
         />
-        <ConditionGroup
-          icon={Utensils}
-          title="식사 주의사항"
-          subtitle="자극적인 음식"
-          options={MEAL_CAUTION_OPTIONS}
-          selected={mealCautionId ?? ''}
-          onSelect={setMealCaution}
-        />
+        <div role="group" aria-label="식사 주의사항">
+          <div className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-ink">
+            <Utensils size={16} aria-hidden="true" />
+            <span>식사 주의사항</span>
+          </div>
+          <div className="flex flex-col gap-5">
+            <ConditionChipRow
+              subtitle="자극적인 음식"
+              options={MEAL_CAUTION_OPTIONS}
+              selected={mealCautionId ?? ''}
+              onSelect={setMealCaution}
+            />
+            <ConditionChipRow
+              subtitle="섭취가 부담될 수 있는 음식"
+              options={BURDENSOME_FOOD_OPTIONS}
+              selected={burdensomeFoodIds}
+              onSelect={toggleBurdensomeFood}
+            />
+          </div>
+        </div>
       </div>
     </OnboardingStepLayout>
   )

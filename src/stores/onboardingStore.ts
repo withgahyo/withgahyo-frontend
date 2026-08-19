@@ -4,6 +4,10 @@ function toggleId(ids: string[], id: string) {
   return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]
 }
 
+function toggleSingle(current: string | null, id: string) {
+  return current === id ? null : id
+}
+
 interface OnboardingState {
   durationId: string | null
   tourismPreferenceIds: string[]
@@ -13,6 +17,7 @@ interface OnboardingState {
   stairsToleranceId: string | null
   facilityIds: string[]
   mealCautionId: string | null
+  burdensomeFoodIds: string[]
 
   setDuration: (id: string) => void
   toggleTourismPreference: (id: string) => void
@@ -22,6 +27,7 @@ interface OnboardingState {
   setStairsTolerance: (id: string) => void
   toggleFacility: (id: string) => void
   setMealCaution: (id: string) => void
+  toggleBurdensomeFood: (id: string) => void
 }
 
 export const useOnboardingStore = create<OnboardingState>((set) => ({
@@ -33,6 +39,7 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
   stairsToleranceId: null,
   facilityIds: [],
   mealCautionId: null,
+  burdensomeFoodIds: [],
 
   setDuration: (id) => set({ durationId: id }),
   toggleTourismPreference: (id) =>
@@ -43,10 +50,20 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     set((state) => ({
       foodPreferenceIds: toggleId(state.foodPreferenceIds, id),
     })),
-  setWalkingTime: (id) => set({ walkingTimeId: id }),
-  setRestNeed: (id) => set({ restNeedId: id }),
-  setStairsTolerance: (id) => set({ stairsToleranceId: id }),
+  setWalkingTime: (id) =>
+    set((state) => ({ walkingTimeId: toggleSingle(state.walkingTimeId, id) })),
+  setRestNeed: (id) =>
+    set((state) => ({ restNeedId: toggleSingle(state.restNeedId, id) })),
+  setStairsTolerance: (id) =>
+    set((state) => ({
+      stairsToleranceId: toggleSingle(state.stairsToleranceId, id),
+    })),
   toggleFacility: (id) =>
     set((state) => ({ facilityIds: toggleId(state.facilityIds, id) })),
-  setMealCaution: (id) => set({ mealCautionId: id }),
+  setMealCaution: (id) =>
+    set((state) => ({ mealCautionId: toggleSingle(state.mealCautionId, id) })),
+  toggleBurdensomeFood: (id) =>
+    set((state) => ({
+      burdensomeFoodIds: toggleId(state.burdensomeFoodIds, id),
+    })),
 }))

@@ -74,3 +74,12 @@ export const MEAL_CAUTION_OPTIONS: ConditionChoice[] = [
   { id: 'a-little', label: '조금만 먹어요' },
   { id: 'avoid', label: '피하고 싶어요' },
 ]
+
+export const BURDENSOME_FOOD_OPTIONS: ConditionChoice[] = [
+  { id: 'spicy', label: '매운 음식' },
+  { id: 'fried', label: '튀김류' },
+  { id: 'flour', label: '밀가루' },
+  { id: 'meat', label: '육류' },
+  { id: 'seafood', label: '해산물' },
+  { id: 'alcohol', label: '술' },
+]
