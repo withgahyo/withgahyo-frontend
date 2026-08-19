@@ -1,21 +1,12 @@
-import splashLogo from '../../../assets/splash/splash-logo.png'
+import splashLogo from '../../../assets/splash/splash-logo-blue.svg'
 import illustrationBlue from '../../../assets/splash/splash-illustration-blue.png'
 import illustrationLime from '../../../assets/splash/splash-illustration-lime.png'
 import kakaoIcon from '../../../assets/icons/kakao.webp'
 import googleIcon from '../../../assets/icons/google.webp'
 
-export type AuthLandingStage =
-  | 'initial'
-  | 'logoIn'
-  | 'illustrationCrossfade'
-  | 'buttonsIn'
+export type AuthLandingStage = 'initial' | 'logoIn' | 'illustrationCrossfade' | 'buttonsIn'
 
-const STAGE_ORDER: AuthLandingStage[] = [
-  'initial',
-  'logoIn',
-  'illustrationCrossfade',
-  'buttonsIn',
-]
+const STAGE_ORDER: AuthLandingStage[] = ['initial', 'logoIn', 'illustrationCrossfade', 'buttonsIn']
 
 interface AuthLandingSceneProps {
   stage: AuthLandingStage
@@ -67,9 +58,7 @@ function AuthLandingScene({ stage }: AuthLandingSceneProps) {
           <button
             type="button"
             className={`flex items-center justify-center gap-2 rounded-full bg-[#FEE500] py-4 text-base font-semibold text-[#181600] transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100 ${
-              areButtonsVisible
-                ? 'translate-y-0 opacity-100'
-                : 'translate-y-4 opacity-0'
+              areButtonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
           >
             <img src={kakaoIcon} alt="" className="h-6 w-6" />
@@ -79,9 +68,7 @@ function AuthLandingScene({ stage }: AuthLandingSceneProps) {
           <button
             type="button"
             className={`flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-white py-4 text-base font-semibold text-ink transition-all delay-100 duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100 ${
-              areButtonsVisible
-                ? 'translate-y-0 opacity-100'
-                : 'translate-y-4 opacity-0'
+              areButtonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
             }`}
           >
             <img src={googleIcon} alt="" className="h-6 w-6" />
