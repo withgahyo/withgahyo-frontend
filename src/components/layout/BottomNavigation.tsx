@@ -9,6 +9,10 @@ const TAB_ITEMS = [
   { to: ROUTE_PATHS.mypage, label: '마이페이지', Icon: User },
 ] as const
 
+// TODO: 탭바 실제 디자인 적용 시 fixed/sticky 전환 + 높이 확정 + 중앙 플로팅 버튼과 함께
+// pb-[env(safe-area-inset-bottom)]과 MainTabLayout 하단 padding을 재검토할 것.
+// (AppContainer의 Safe Area는 normal-flow 요소만 보호하며, fixed로 전환되는 순간
+// AppContainer 바깥으로 벗어나므로 이 컴포넌트가 직접 하단 Safe Area를 책임져야 함)
 function BottomNavigation() {
   return (
     <nav aria-label="주요 메뉴">
