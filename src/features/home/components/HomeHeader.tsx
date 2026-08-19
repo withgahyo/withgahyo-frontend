@@ -5,8 +5,8 @@ import { ROUTE_PATHS } from '../../../routes/routePaths'
 
 function HomeHeader() {
   return (
-    <header className="flex items-center justify-between px-6 pt-4">
-      <img src={logoLime} alt="같이가효" className="h-8 w-auto" />
+    <header className="flex items-center justify-between px-6 pt-5">
+      <img src={logoLime} alt="같이가효" className="h-9 w-auto" />
 
       <Link
         to={ROUTE_PATHS.notifications}

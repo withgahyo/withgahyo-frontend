@@ -4,7 +4,7 @@ import { MOCK_FAVORITE_COURSES } from '../mock'
 
 function FavoriteCourseSection() {
   return (
-    <section className="px-6 pb-10 pt-8">
+    <section className="px-6 pb-10 pt-5">
       <div className="flex items-center justify-between pb-4">
         <h2 className="text-lg font-bold text-white">찜한 코스</h2>
 
