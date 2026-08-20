@@ -80,7 +80,7 @@ function BottomNavigation() {
       </nav>
 
       <Link
-        to={ROUTE_PATHS.courseCreateRegion}
+        to={ROUTE_PATHS.courseCreate}
         aria-label="새 여행 코스 만들기"
         className="absolute left-1/2 top-0 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-lime shadow-fab transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
       >
