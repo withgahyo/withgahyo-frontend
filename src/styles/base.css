@@ -29,3 +29,11 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
 }
+
+/* min-h-app과 동일한 폴백 패턴의 고정 height 버전.
+   내부에서 header 고정 + sheet만 스크롤시키는 레이아웃(예: 코스 생성 페이지)처럼
+   뷰포트에 꽉 맞는 실제 높이가 필요할 때 사용한다. */
+.h-app {
+  height: 100vh;
+  height: 100dvh;
+}
