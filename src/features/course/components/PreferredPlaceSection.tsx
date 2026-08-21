@@ -2,10 +2,11 @@ import { ChevronDown, Search } from 'lucide-react'
 import { useState } from 'react'
 import FormSectionLabel from './FormSectionLabel'
 import SelectedItemChip from '../../../components/common/SelectedItemChip'
-import { PLACE_MOCK_OPTIONS } from '../constants'
+import { PLACE_MOCK_OPTIONS_BY_REGION } from '../constants'
 import type { PlaceOption } from '../types'
 
 interface PreferredPlaceSectionProps {
+  regionId: string | null
   selectedPlaces: PlaceOption[]
   onAdd: (place: PlaceOption) => void
   onRemove: (id: string) => void
@@ -13,13 +14,24 @@ interface PreferredPlaceSectionProps {
 
 const FIELD_ID = 'preferred-places'
 
-function PreferredPlaceSection({ selectedPlaces, onAdd, onRemove }: PreferredPlaceSectionProps) {
+function PreferredPlaceSection({
+  regionId,
+  selectedPlaces,
+  onAdd,
+  onRemove,
+}: PreferredPlaceSectionProps) {
   const [isOpen, setIsOpen] = useState(false)
   const selectedIds = selectedPlaces.map((place) => place.id)
+  const placeOptions = regionId ? (PLACE_MOCK_OPTIONS_BY_REGION[regionId] ?? []) : []
 
   const handleAdd = (place: PlaceOption) => {
     onAdd(place)
     setIsOpen(false)
+  }
+
+  const handleTriggerClick = () => {
+    if (!regionId) return
+    setIsOpen((prev) => !prev)
   }
 
   return (
@@ -30,13 +42,17 @@ function PreferredPlaceSection({ selectedPlaces, onAdd, onRemove }: PreferredPla
         <button
           id={FIELD_ID}
           type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={handleTriggerClick}
+          disabled={!regionId}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          className="flex w-full items-center gap-2 rounded-2xl border border-gray-200 px-4 py-4 text-left text-sm text-gray-400 focus:border-brand-blue focus:outline-none"
+          aria-disabled={!regionId}
+          className="flex w-full items-center gap-2 rounded-2xl border border-gray-200 px-4 py-4 text-left text-sm text-gray-400 focus:border-brand-blue focus:outline-none disabled:cursor-not-allowed"
         >
           <Search aria-hidden="true" size={18} className="shrink-0 text-gray-400" />
-          <span className="flex-1">꼭 가고 싶은 장소 검색해서 추가하기</span>
+          <span className="flex-1">
+            {regionId ? '꼭 가고 싶은 장소 검색해서 추가하기' : '여행 장소를 먼저 선택해주세요'}
+          </span>
           <ChevronDown aria-hidden="true" size={18} className="shrink-0 text-gray-400" />
         </button>
 
@@ -47,7 +63,7 @@ function PreferredPlaceSection({ selectedPlaces, onAdd, onRemove }: PreferredPla
             aria-label="장소 목록"
             className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg"
           >
-            {PLACE_MOCK_OPTIONS.map((place) => {
+            {placeOptions.map((place) => {
               const isSelected = selectedIds.includes(place.id)
               return (
                 <li key={place.id}>

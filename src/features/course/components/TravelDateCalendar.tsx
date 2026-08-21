@@ -13,6 +13,7 @@ const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 function TravelDateCalendar({ startDate, endDate, onSelectDate }: TravelDateCalendarProps) {
   const today = new Date()
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())
 
@@ -85,22 +86,27 @@ function TravelDateCalendar({ startDate, endDate, onSelectDate }: TravelDateCale
                 const isEnd = isSameDay(date, endDate)
                 const isSelected = isStart || isEnd
                 const isInRange = isDateInRange(date, startDate, endDate)
+                const isPast = date.getTime() < todayStart.getTime()
 
                 return (
                   <div key={cellIndex} className="flex items-center justify-center py-1">
                     <button
                       type="button"
                       onClick={() => onSelectDate(date)}
+                      disabled={isPast}
                       aria-pressed={isSelected}
+                      aria-disabled={isPast}
                       aria-label={`${viewMonth + 1}월 ${date.getDate()}일`}
-                      className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors ${
-                        isSelected
-                          ? 'bg-brand-lime text-ink'
-                          : isInRange
-                            ? 'bg-brand-lime/25 text-ink'
-                            : isWeekend(date)
-                              ? 'text-red-500'
-                              : 'text-ink'
+                      className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors disabled:cursor-not-allowed ${
+                        isPast
+                          ? 'text-gray-300'
+                          : isSelected
+                            ? 'bg-brand-lime text-ink'
+                            : isInRange
+                              ? 'bg-brand-lime/25 text-ink'
+                              : isWeekend(date)
+                                ? 'text-red-500'
+                                : 'text-ink'
                       }`}
                     >
                       {date.getDate()}

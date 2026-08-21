@@ -9,7 +9,7 @@ import TravelDateCalendar from '../../features/course/components/TravelDateCalen
 import FamilyMemberSelector from '../../features/course/components/FamilyMemberSelector'
 import { isSameDay } from '../../features/course/utils/calendarUtils'
 import { isCourseNameValid } from '../../features/course/utils/validateCourseName'
-import type { CourseCreateFormState, PlaceOption } from '../../features/course/types'
+import type { CourseCreateFormState, PlaceOption, RegionOption } from '../../features/course/types'
 
 const INITIAL_FORM_STATE: CourseCreateFormState = {
   courseName: '',
@@ -44,6 +44,14 @@ function CourseCreatePage() {
 
       return { ...prev, startDate: date, endDate: null }
     })
+  }
+
+  const handleSelectRegion = (region: RegionOption) => {
+    setForm((prev) =>
+      prev.region?.id === region.id
+        ? prev
+        : { ...prev, region, preferredPlaces: [] },
+    )
   }
 
   const handleAddPlace = (place: PlaceOption) => {
@@ -83,9 +91,13 @@ function CourseCreatePage() {
             onChange={(courseName) => setForm((prev) => ({ ...prev, courseName }))}
           />
 
-          <RegionSelectField
-            value={form.region}
-            onSelect={(region) => setForm((prev) => ({ ...prev, region }))}
+          <RegionSelectField value={form.region} onSelect={handleSelectRegion} />
+
+          <PreferredPlaceSection
+            regionId={form.region?.id ?? null}
+            selectedPlaces={form.preferredPlaces}
+            onAdd={handleAddPlace}
+            onRemove={handleRemovePlace}
           />
 
           <KeywordSelectSection
@@ -93,12 +105,6 @@ function CourseCreatePage() {
             onToggle={(id) =>
               setForm((prev) => ({ ...prev, keywordIds: toggleId(prev.keywordIds, id) }))
             }
-          />
-
-          <PreferredPlaceSection
-            selectedPlaces={form.preferredPlaces}
-            onAdd={handleAddPlace}
-            onRemove={handleRemovePlace}
           />
 
           <TravelDateCalendar

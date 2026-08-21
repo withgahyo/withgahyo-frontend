@@ -34,7 +34,7 @@ function RegionSelectField({ value, onSelect }: RegionSelectFieldProps) {
         >
           <Search aria-hidden="true" size={18} className="shrink-0 text-gray-400" />
           <span className={`flex-1 truncate ${value ? 'text-ink' : 'text-gray-400'}`}>
-            {value ? value.label : '시 단위로 검색해주세요'}
+            {value ? value.label : '여행할 도를 선택해주세요'}
           </span>
           <ChevronDown aria-hidden="true" size={18} className="shrink-0 text-gray-400" />
         </button>

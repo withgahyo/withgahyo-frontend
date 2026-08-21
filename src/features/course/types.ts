@@ -18,6 +18,8 @@ export interface FamilyMemberOption {
   name: string
 }
 
+export type PlaceOptionsByRegion = Record<string, PlaceOption[]>
+
 export interface CourseCreateFormState {
   courseName: string
   region: RegionOption | null
