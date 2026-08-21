@@ -1,10 +1,13 @@
 import type { ButtonHTMLAttributes } from 'react'
 
-type PrimaryButtonProps = ButtonHTMLAttributes<HTMLButtonElement>
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'lime'
+}
 
 function PrimaryButton({
   className = '',
   disabled,
+  variant = 'default',
   children,
   ...rest
 }: PrimaryButtonProps) {
@@ -16,7 +19,7 @@ function PrimaryButton({
       className={`w-full rounded-full py-4 text-base font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
         disabled
           ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-          : 'bg-brand-blue text-white'
+          : `bg-brand-blue ${variant === 'lime' ? 'text-brand-lime' : 'text-white'}`
       } ${className}`}
       {...rest}
     >

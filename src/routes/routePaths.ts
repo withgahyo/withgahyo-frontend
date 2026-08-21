@@ -13,12 +13,7 @@ export const ROUTE_PATHS = {
   albums: '/albums',
   mypage: '/mypage',
 
-  courseCreateRegion: '/courses/create/region',
-  courseCreateDate: '/courses/create/date',
-  courseCreateFamily: '/courses/create/family',
-  courseCreateKeywords: '/courses/create/keywords',
-  courseCreatePlaces: '/courses/create/places',
-  courseCreateConfirm: '/courses/create/confirm',
+  courseCreate: '/courses/create',
 
   courseGenerating: (generationId: string) =>
     `/courses/generating/${generationId}`,

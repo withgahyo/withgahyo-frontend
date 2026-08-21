@@ -19,12 +19,7 @@ import AlbumsPage from '../pages/albums/AlbumsPage'
 import AlbumDetailPage from '../pages/albums/AlbumDetailPage'
 import MyPage from '../pages/mypage/MyPage'
 
-import CourseCreateRegionPage from '../pages/course/CourseCreateRegionPage'
-import CourseCreateDatePage from '../pages/course/CourseCreateDatePage'
-import CourseCreateFamilyPage from '../pages/course/CourseCreateFamilyPage'
-import CourseCreateKeywordsPage from '../pages/course/CourseCreateKeywordsPage'
-import CourseCreatePlacesPage from '../pages/course/CourseCreatePlacesPage'
-import CourseCreateConfirmPage from '../pages/course/CourseCreateConfirmPage'
+import CourseCreatePage from '../pages/course/CourseCreatePage'
 import CourseGeneratingPage from '../pages/course/CourseGeneratingPage'
 import CourseRecommendationsPage from '../pages/course/CourseRecommendationsPage'
 import CourseDetailPage from '../pages/course/CourseDetailPage'
@@ -80,28 +75,8 @@ export const router = createBrowserRouter([
           },
 
           {
-            path: ROUTE_PATHS.courseCreateRegion,
-            element: <CourseCreateRegionPage />,
-          },
-          {
-            path: ROUTE_PATHS.courseCreateDate,
-            element: <CourseCreateDatePage />,
-          },
-          {
-            path: ROUTE_PATHS.courseCreateFamily,
-            element: <CourseCreateFamilyPage />,
-          },
-          {
-            path: ROUTE_PATHS.courseCreateKeywords,
-            element: <CourseCreateKeywordsPage />,
-          },
-          {
-            path: ROUTE_PATHS.courseCreatePlaces,
-            element: <CourseCreatePlacesPage />,
-          },
-          {
-            path: ROUTE_PATHS.courseCreateConfirm,
-            element: <CourseCreateConfirmPage />,
+            path: ROUTE_PATHS.courseCreate,
+            element: <CourseCreatePage />,
           },
 
           {

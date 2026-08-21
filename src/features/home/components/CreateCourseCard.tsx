@@ -9,7 +9,7 @@ interface CreateCourseCardProps {
 function CreateCourseCard({ active }: CreateCourseCardProps) {
   return (
     <Link
-      to={ROUTE_PATHS.courseCreateRegion}
+      to={ROUTE_PATHS.courseCreate}
       aria-label="새 가족 여행 코스 만들기"
       aria-hidden={!active}
       tabIndex={active ? undefined : -1}
