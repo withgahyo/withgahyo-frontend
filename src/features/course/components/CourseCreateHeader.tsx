@@ -6,15 +6,15 @@ function CourseCreateHeader() {
   const navigate = useNavigate()
 
   return (
-    <div className="relative shrink-0 overflow-hidden bg-brand-blue">
+    <div className="relative shrink-0 overflow-hidden bg-brand-blue pt-6">
       <img
         src={vectorDecoration}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-10 w-[140%] max-w-none"
+        className="pointer-events-none absolute -right-8 -top-10 w-[120%] max-w-none"
       />
 
-      <div className="relative z-10 flex items-center gap-2 px-6 pb-8 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
+      <div className="relative z-10 flex items-center px-3 pb-10 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
         <button
           type="button"
           onClick={() => navigate(-1)}

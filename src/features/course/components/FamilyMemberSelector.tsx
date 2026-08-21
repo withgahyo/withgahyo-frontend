@@ -12,7 +12,7 @@ function FamilyMemberSelector({ selectedIds, onToggle }: FamilyMemberSelectorPro
     <div className="flex flex-col gap-3">
       <FormSectionLabel>함께 갈 가족 구성원</FormSectionLabel>
 
-      <div className="flex gap-4 overflow-x-auto pb-1">
+      <div className="flex gap-4 overflow-x-auto py-1">
         {FAMILY_MEMBER_MOCK_OPTIONS.map((member) => {
           const isSelected = selectedIds.includes(member.id)
           return (

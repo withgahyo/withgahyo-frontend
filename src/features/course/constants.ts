@@ -72,10 +72,11 @@ export const PLACE_MOCK_OPTIONS_BY_REGION: PlaceOptionsByRegion = {
   ],
 }
 
+// '나'는 항상 함께 가는 것이 당연하므로 가장 왼쪽에 두고 기본 선택한다.
 // TODO: 실제 가족 구성원 API 연동 시 교체
 export const FAMILY_MEMBER_MOCK_OPTIONS: FamilyMemberOption[] = [
+  { id: 'me', name: '나' },
   { id: 'father', name: '아빠' },
   { id: 'mother', name: '엄마' },
-  { id: 'me', name: '나' },
   { id: 'sibling', name: '동생' },
 ]

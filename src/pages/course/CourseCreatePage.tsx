@@ -18,7 +18,8 @@ const INITIAL_FORM_STATE: CourseCreateFormState = {
   preferredPlaces: [],
   startDate: null,
   endDate: null,
-  familyMemberIds: [],
+  // '나'는 당연히 함께 가는 구성원이라 기본으로 선택해 둔다.
+  familyMemberIds: ['me'],
 }
 
 function toggleId(ids: string[], id: string) {
@@ -48,9 +49,7 @@ function CourseCreatePage() {
 
   const handleSelectRegion = (region: RegionOption) => {
     setForm((prev) =>
-      prev.region?.id === region.id
-        ? prev
-        : { ...prev, region, preferredPlaces: [] },
+      prev.region?.id === region.id ? prev : { ...prev, region, preferredPlaces: [] },
     )
   }
 
