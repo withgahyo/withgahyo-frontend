@@ -10,13 +10,25 @@ const STAGE_ORDER: AuthLandingStage[] = ['initial', 'logoIn', 'illustrationCross
 
 interface AuthLandingSceneProps {
   stage: AuthLandingStage
+  isKakaoLoading?: boolean
+  isGoogleLoading?: boolean
+  errorMessage?: string
+  onKakaoLogin?: () => void
+  onGoogleLogin?: () => void
 }
 
 function hasReached(stage: AuthLandingStage, target: AuthLandingStage) {
   return STAGE_ORDER.indexOf(stage) >= STAGE_ORDER.indexOf(target)
 }
 
-function AuthLandingScene({ stage }: AuthLandingSceneProps) {
+function AuthLandingScene({
+  stage,
+  isKakaoLoading = false,
+  isGoogleLoading = false,
+  errorMessage,
+  onKakaoLogin,
+  onGoogleLogin,
+}: AuthLandingSceneProps) {
   const isLogoVisible = hasReached(stage, 'logoIn')
   const isIllustrationCrossfaded = hasReached(stage, 'illustrationCrossfade')
   const areButtonsVisible = hasReached(stage, 'buttonsIn')
@@ -55,24 +67,33 @@ function AuthLandingScene({ stage }: AuthLandingSceneProps) {
         </div>
 
         <div className="absolute inset-x-0 bottom-10 z-10 flex flex-col gap-3 px-6">
+          {errorMessage && (
+            <p className="rounded-lg bg-white/90 px-4 py-3 text-center text-sm font-medium text-red-600">
+              {errorMessage}
+            </p>
+          )}
           <button
             type="button"
+            onClick={onKakaoLogin}
+            disabled={isKakaoLoading || isGoogleLoading}
             className={`flex items-center justify-center gap-2 rounded-full bg-[#FEE500] py-4 text-base font-semibold text-[#181600] transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100 ${
               areButtonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
+            } disabled:cursor-not-allowed disabled:opacity-70`}
           >
             <img src={kakaoIcon} alt="" className="h-6 w-6" />
-            카카오톡으로 시작하기
+            {isKakaoLoading ? '카카오 로그인 이동 중' : '카카오톡으로 시작하기'}
           </button>
 
           <button
             type="button"
+            onClick={onGoogleLogin}
+            disabled={isKakaoLoading || isGoogleLoading}
             className={`flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-white py-4 text-base font-semibold text-ink transition-all delay-100 duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100 ${
               areButtonsVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}
+            } disabled:cursor-not-allowed disabled:opacity-70`}
           >
             <img src={googleIcon} alt="" className="h-6 w-6" />
-            구글 계정으로 시작하기
+            {isGoogleLoading ? '구글 로그인 이동 중' : '구글 계정으로 시작하기'}
           </button>
         </div>
       </div>
