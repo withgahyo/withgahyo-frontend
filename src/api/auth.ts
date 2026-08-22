@@ -9,6 +9,18 @@ export interface SocialLoginRequest {
 export interface AuthTokenResponse {
   accessToken: string
   refreshToken: string
+  tokenType?: string
+  expiresIn?: number
+  isNewUser?: boolean
+  user?: AuthUserResponse
+}
+
+export interface AuthUserResponse {
+  userId: number
+  nickname: string
+  profileImageUrl?: string | null
+  email?: string | null
+  onboardingCompleted?: boolean
 }
 
 export interface TokenRefreshRequest {
@@ -53,6 +65,10 @@ export async function refreshAuthToken(request: TokenRefreshRequest) {
 
 export async function logout() {
   await apiClient.post<BackendApiResponse<null>>('/api/v1/auth/logout')
+}
+
+export async function withdrawUser() {
+  await apiClient.delete<BackendApiResponse<null>>('/api/v1/users/me')
 }
 
 export function unwrapApiResponse<T>(response: BackendApiResponse<T>) {

@@ -5,6 +5,7 @@ import {
   logout,
   type AuthTokenResponse,
   type SocialLoginRequest,
+  withdrawUser,
 } from '../../../api/auth'
 import { clearAuthTokens, setAuthTokens } from '../utils/tokenStorage'
 import type { OAuthProvider } from '../config/oauth'
@@ -32,5 +33,12 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: logout,
     onSettled: clearAuthTokens,
+  })
+}
+
+export function useWithdrawMutation() {
+  return useMutation({
+    mutationFn: withdrawUser,
+    onSuccess: clearAuthTokens,
   })
 }
