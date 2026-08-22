@@ -1,6 +1,8 @@
 export const ROUTE_PATHS = {
   splash: '/splash',
   login: '/login',
+  kakaoOAuthCallback: '/oauth/kakao/callback',
+  googleOAuthCallback: '/oauth/google/callback',
 
   onboardingDuration: '/onboarding/duration',
   onboardingTourism: '/onboarding/tourism',
@@ -15,10 +17,8 @@ export const ROUTE_PATHS = {
 
   courseCreate: '/courses/create',
 
-  courseGenerating: (generationId: string) =>
-    `/courses/generating/${generationId}`,
-  courseRecommendations: (generationId: string) =>
-    `/courses/recommendations/${generationId}`,
+  courseGenerating: (generationId: string) => `/courses/generating/${generationId}`,
+  courseRecommendations: (generationId: string) => `/courses/recommendations/${generationId}`,
   courseDetail: (courseId: string) => `/courses/${courseId}`,
 
   albumDetail: (albumId: string) => `/albums/${albumId}`,

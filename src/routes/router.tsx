@@ -6,6 +6,7 @@ import FullscreenLayout from '../layouts/FullscreenLayout'
 
 import SplashPage from '../pages/splash/SplashPage'
 import LoginPage from '../pages/login/LoginPage'
+import OAuthCallbackPage from '../pages/login/OAuthCallbackPage'
 
 import OnboardingDurationPage from '../pages/onboarding/OnboardingDurationPage'
 import OnboardingTourismPage from '../pages/onboarding/OnboardingTourismPage'
@@ -39,6 +40,14 @@ export const router = createBrowserRouter([
         children: [
           { path: ROUTE_PATHS.splash, element: <SplashPage /> },
           { path: ROUTE_PATHS.login, element: <LoginPage /> },
+          {
+            path: ROUTE_PATHS.kakaoOAuthCallback,
+            element: <OAuthCallbackPage provider="kakao" />,
+          },
+          {
+            path: ROUTE_PATHS.googleOAuthCallback,
+            element: <OAuthCallbackPage provider="google" />,
+          },
         ],
       },
       {
