@@ -11,8 +11,7 @@ import {
 
 export const PROFILE = {
   name: '홍길동 사장님',
-  handle: 'wondoe1004',
-  badge: '가족 여행 메이트',
+  emptyEmail: '이메일 정보 없음',
 } as const
 
 export const FAMILY_MENU_ITEMS = [

@@ -8,6 +8,8 @@ interface MenuSectionItem {
   Icon: LucideIcon
   TrailingIcon?: LucideIcon
   isDanger?: boolean
+  onClick?: () => void
+  disabled?: boolean
 }
 
 interface MenuSectionProps {

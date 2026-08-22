@@ -6,6 +6,8 @@ interface MenuItemButtonProps {
   Icon: LucideIcon
   TrailingIcon?: LucideIcon
   isDanger?: boolean
+  onClick?: () => void
+  disabled?: boolean
 }
 
 function MenuItemButton({
@@ -14,11 +16,15 @@ function MenuItemButton({
   Icon,
   TrailingIcon,
   isDanger = false,
+  onClick,
+  disabled = false,
 }: MenuItemButtonProps) {
   return (
     <button
       type="button"
-      className="flex w-full items-center gap-3 py-4 text-left transition-opacity active:opacity-70"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex w-full items-center gap-3 py-4 text-left transition-opacity active:opacity-70 disabled:cursor-not-allowed disabled:opacity-55"
     >
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
