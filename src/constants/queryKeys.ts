@@ -6,6 +6,11 @@ export const queryKeys = {
   notifications: ['notifications'] as const,
 
   course: (courseId: number) => ['courses', courseId] as const,
+  courseRegions: ['course', 'regions'] as const,
+  coursePlaces: (areaCode: string, sigunguCode: string, query: string) =>
+    ['course', 'places', areaCode, sigunguCode, query] as const,
+  courseKeywords: ['course', 'keywords'] as const,
+  courseFamilyMembers: ['course', 'family-members'] as const,
 
   album: (albumId: number) => ['albums', albumId] as const,
 }

@@ -1,4 +1,13 @@
 import { useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import {
+  createCourse,
+  getCourseFamilyMembers,
+  getCourseKeywordSuggestions,
+  searchPlaces,
+  searchRegions,
+} from '../../api/course'
 import PrimaryButton from '../../components/common/PrimaryButton'
 import CourseCreateHeader from '../../features/course/components/CourseCreateHeader'
 import CourseNameField from '../../features/course/components/CourseNameField'
@@ -7,6 +16,8 @@ import KeywordSelectSection from '../../features/course/components/KeywordSelect
 import PreferredPlaceSection from '../../features/course/components/PreferredPlaceSection'
 import TravelDateCalendar from '../../features/course/components/TravelDateCalendar'
 import FamilyMemberSelector from '../../features/course/components/FamilyMemberSelector'
+import { queryKeys } from '../../constants/queryKeys'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 import { isSameDay } from '../../features/course/utils/calendarUtils'
 import { isCourseNameValid } from '../../features/course/utils/validateCourseName'
 import type { CourseCreateFormState, PlaceOption, RegionOption } from '../../features/course/types'
@@ -18,16 +29,83 @@ const INITIAL_FORM_STATE: CourseCreateFormState = {
   preferredPlaces: [],
   startDate: null,
   endDate: null,
-  // '나'는 당연히 함께 가는 구성원이라 기본으로 선택해 둔다.
-  familyMemberIds: ['me'],
+  familyMemberIds: [],
 }
 
-function toggleId(ids: string[], id: string) {
+function toggleId(ids: number[], id: number) {
   return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]
 }
 
+function formatDate(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 function CourseCreatePage() {
+  const navigate = useNavigate()
   const [form, setForm] = useState<CourseCreateFormState>(INITIAL_FORM_STATE)
+  const [placeSearchQuery, setPlaceSearchQuery] = useState('')
+
+  const regionsQuery = useQuery({
+    queryKey: queryKeys.courseRegions,
+    queryFn: () => searchRegions(),
+  })
+  const keywordsQuery = useQuery({
+    queryKey: queryKeys.courseKeywords,
+    queryFn: getCourseKeywordSuggestions,
+  })
+  const familyMembersQuery = useQuery({
+    queryKey: queryKeys.courseFamilyMembers,
+    queryFn: getCourseFamilyMembers,
+  })
+  const placeQueryText = placeSearchQuery.trim()
+  const placesQuery = useQuery({
+    queryKey: form.region && placeQueryText
+      ? queryKeys.coursePlaces(form.region.areaCode, form.region.sigunguCode, placeQueryText)
+      : queryKeys.coursePlaces('', '', ''),
+    queryFn: () =>
+      searchPlaces({
+        areaCode: form.region?.areaCode ?? '',
+        sigunguCode: form.region?.sigunguCode ?? '0',
+        query: placeQueryText,
+        size: 10,
+      }),
+    enabled: Boolean(form.region && placeQueryText),
+  })
+  const createCourseMutation = useMutation({
+    mutationFn: createCourse,
+    onSuccess: (response) => {
+      navigate(ROUTE_PATHS.courseGenerating(String(response.courseId)))
+    },
+  })
+
+  const regions =
+    regionsQuery.data?.regions.map((region) => ({
+      id: `${region.areaCode}:${region.sigunguCode}`,
+      label: region.displayName,
+      areaCode: region.areaCode,
+      sigunguCode: region.sigunguCode,
+    })) ?? []
+  const keywords =
+    keywordsQuery.data?.keywords.map((keyword) => ({
+      id: keyword.keywordId,
+      label: keyword.name,
+    })) ?? []
+  const familyMembers =
+    familyMembersQuery.data?.familyMembers.map((member) => ({
+      id: member.familyMemberId,
+      name: member.nickname,
+      relationship: member.relationship,
+      profileImageUrl: member.profileImageUrl,
+    })) ?? []
+  const places =
+    placesQuery.data?.places.map<PlaceOption>((place) => ({
+      id: place.placeId,
+      label: place.name,
+      address: place.address,
+    })) ?? []
 
   const handleSelectDate = (date: Date) => {
     setForm((prev) => {
@@ -51,6 +129,7 @@ function CourseCreatePage() {
     setForm((prev) =>
       prev.region?.id === region.id ? prev : { ...prev, region, preferredPlaces: [] },
     )
+    setPlaceSearchQuery('')
   }
 
   const handleAddPlace = (place: PlaceOption) => {
@@ -61,7 +140,7 @@ function CourseCreatePage() {
     )
   }
 
-  const handleRemovePlace = (id: string) => {
+  const handleRemovePlace = (id: number) => {
     setForm((prev) => ({
       ...prev,
       preferredPlaces: prev.preferredPlaces.filter((place) => place.id !== id),
@@ -72,11 +151,22 @@ function CourseCreatePage() {
     isCourseNameValid(form.courseName) &&
     form.region !== null &&
     form.startDate !== null &&
-    form.familyMemberIds.length > 0
+    form.endDate !== null
 
   const handleGenerate = () => {
-    // TODO: 코스 생성 API 연동 후 request DTO 변환 및 생성 요청
-    // TODO: 생성 요청 성공 후 generating/recommendation 화면으로 이동
+    if (!isFormValid || !form.region || !form.startDate || !form.endDate) return
+
+    createCourseMutation.mutate({
+      title: form.courseName,
+      areaCode: form.region.areaCode,
+      sigunguCode: form.region.sigunguCode,
+      startDate: formatDate(form.startDate),
+      endDate: formatDate(form.endDate),
+      familyMemberIds: form.familyMemberIds,
+      keywordIds: form.keywordIds,
+      mustVisitPlaceIds: form.preferredPlaces.map((place) => place.id),
+      transportMode: 'CAR',
+    })
   }
 
   return (
@@ -90,16 +180,30 @@ function CourseCreatePage() {
             onChange={(courseName) => setForm((prev) => ({ ...prev, courseName }))}
           />
 
-          <RegionSelectField value={form.region} onSelect={handleSelectRegion} />
+          <RegionSelectField
+            value={form.region}
+            regions={regions}
+            isLoading={regionsQuery.isLoading}
+            errorMessage={regionsQuery.isError ? '지역 목록을 불러오지 못했습니다.' : undefined}
+            onSelect={handleSelectRegion}
+          />
 
           <PreferredPlaceSection
             regionId={form.region?.id ?? null}
+            searchQuery={placeSearchQuery}
+            places={places}
+            isLoading={placesQuery.isFetching}
+            errorMessage={placesQuery.isError ? '장소 검색 결과를 불러오지 못했습니다.' : undefined}
             selectedPlaces={form.preferredPlaces}
+            onSearchQueryChange={setPlaceSearchQuery}
             onAdd={handleAddPlace}
             onRemove={handleRemovePlace}
           />
 
           <KeywordSelectSection
+            keywords={keywords}
+            isLoading={keywordsQuery.isLoading}
+            errorMessage={keywordsQuery.isError ? '키워드를 불러오지 못했습니다.' : undefined}
             selectedIds={form.keywordIds}
             onToggle={(id) =>
               setForm((prev) => ({ ...prev, keywordIds: toggleId(prev.keywordIds, id) }))
@@ -113,6 +217,11 @@ function CourseCreatePage() {
           />
 
           <FamilyMemberSelector
+            familyMembers={familyMembers}
+            isLoading={familyMembersQuery.isLoading}
+            errorMessage={
+              familyMembersQuery.isError ? '가족 구성원을 불러오지 못했습니다.' : undefined
+            }
             selectedIds={form.familyMemberIds}
             onToggle={(id) =>
               setForm((prev) => ({
@@ -122,8 +231,16 @@ function CourseCreatePage() {
             }
           />
 
-          <PrimaryButton variant="lime" disabled={!isFormValid} onClick={handleGenerate}>
-            AI 코스 생성하기
+          {createCourseMutation.isError && (
+            <p className="text-center text-sm text-red-500">코스 생성에 실패했습니다.</p>
+          )}
+
+          <PrimaryButton
+            variant="lime"
+            disabled={!isFormValid || createCourseMutation.isPending}
+            onClick={handleGenerate}
+          >
+            {createCourseMutation.isPending ? '생성 중...' : 'AI 코스 생성하기'}
           </PrimaryButton>
         </div>
       </div>

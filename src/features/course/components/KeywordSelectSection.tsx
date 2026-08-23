@@ -2,18 +2,27 @@ import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import FormSectionLabel from './FormSectionLabel'
 import SelectedItemChip from '../../../components/common/SelectedItemChip'
-import { KEYWORD_OPTIONS } from '../constants'
+import type { KeywordOption } from '../types'
 
 interface KeywordSelectSectionProps {
-  selectedIds: string[]
-  onToggle: (id: string) => void
+  keywords: KeywordOption[]
+  isLoading?: boolean
+  errorMessage?: string
+  selectedIds: number[]
+  onToggle: (id: number) => void
 }
 
 const FIELD_ID = 'keywords'
 
-function KeywordSelectSection({ selectedIds, onToggle }: KeywordSelectSectionProps) {
+function KeywordSelectSection({
+  keywords,
+  isLoading = false,
+  errorMessage,
+  selectedIds,
+  onToggle,
+}: KeywordSelectSectionProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const selectedKeywords = KEYWORD_OPTIONS.filter((keyword) => selectedIds.includes(keyword.id))
+  const selectedKeywords = keywords.filter((keyword) => selectedIds.includes(keyword.id))
 
   return (
     <div className="flex flex-col gap-3">
@@ -39,24 +48,35 @@ function KeywordSelectSection({ selectedIds, onToggle }: KeywordSelectSectionPro
             aria-label="관심 키워드 목록"
             className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg"
           >
-            {KEYWORD_OPTIONS.map((keyword) => {
-              const isSelected = selectedIds.includes(keyword.id)
-              return (
-                <li key={keyword.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    onClick={() => onToggle(keyword.id)}
-                    className={`w-full px-4 py-3 text-left text-sm ${
-                      isSelected ? 'bg-brand-blue/10 text-brand-blue' : 'text-ink hover:bg-gray-100'
-                    }`}
-                  >
-                    {keyword.label}
-                  </button>
-                </li>
-              )
-            })}
+            {isLoading && <li className="px-4 py-3 text-sm text-gray-400">불러오는 중...</li>}
+            {!isLoading && errorMessage && (
+              <li className="px-4 py-3 text-sm text-red-500">{errorMessage}</li>
+            )}
+            {!isLoading && !errorMessage && keywords.length === 0 && (
+              <li className="px-4 py-3 text-sm text-gray-400">선택 가능한 키워드가 없습니다.</li>
+            )}
+            {!isLoading &&
+              !errorMessage &&
+              keywords.map((keyword) => {
+                const isSelected = selectedIds.includes(keyword.id)
+                return (
+                  <li key={keyword.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      onClick={() => onToggle(keyword.id)}
+                      className={`w-full px-4 py-3 text-left text-sm ${
+                        isSelected
+                          ? 'bg-brand-blue/10 text-brand-blue'
+                          : 'text-ink hover:bg-gray-100'
+                      }`}
+                    >
+                      {keyword.label}
+                    </button>
+                  </li>
+                )
+              })}
           </ul>
         )}
       </div>
