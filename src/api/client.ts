@@ -6,6 +6,7 @@ import {
   getRefreshToken,
   setAuthTokens,
 } from '../features/auth/utils/tokenStorage'
+import { ROUTE_PATHS } from '../routes/routePaths'
 import type { AuthTokenResponse } from './auth'
 
 interface RetriableRequestConfig extends InternalAxiosRequestConfig {
@@ -78,6 +79,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest)
       } catch (refreshError) {
         clearAuthTokens()
+        redirectToLogin()
         return Promise.reject(toApiError(refreshError))
       }
     }
@@ -101,6 +103,20 @@ function shouldRefreshToken(error: AxiosError) {
 
 function isPublicAuthPath(url: string) {
   return PUBLIC_AUTH_PATHS.some((path) => url.includes(path))
+}
+
+function redirectToLogin() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const currentPath = `${window.location.pathname}${window.location.search}`
+  if (currentPath.startsWith(ROUTE_PATHS.login)) {
+    return
+  }
+
+  const redirect = encodeURIComponent(currentPath)
+  window.location.assign(`${ROUTE_PATHS.login}?redirect=${redirect}`)
 }
 
 async function refreshTokens() {
