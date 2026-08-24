@@ -67,7 +67,12 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (axios.isAxiosError(error) && shouldRefreshToken(error)) {
+    if (axios.isAxiosError(error) && isUnauthorizedProtectedRequest(error)) {
+      if (!shouldRefreshToken(error)) {
+        handleAuthExpired()
+        return Promise.reject(toApiError(error))
+      }
+
       try {
         const tokens = await refreshTokens()
         const originalRequest = error.config as RetriableRequestConfig
@@ -78,8 +83,7 @@ apiClient.interceptors.response.use(
 
         return apiClient(originalRequest)
       } catch (refreshError) {
-        clearAuthTokens()
-        redirectToLogin()
+        handleAuthExpired()
         return Promise.reject(toApiError(refreshError))
       }
     }
@@ -88,15 +92,22 @@ apiClient.interceptors.response.use(
   },
 )
 
-function shouldRefreshToken(error: AxiosError) {
+function isUnauthorizedProtectedRequest(error: AxiosError) {
   const originalRequest = error.config as RetriableRequestConfig | undefined
   const requestUrl = originalRequest?.url ?? ''
 
   return (
     error.response?.status === 401 &&
     Boolean(originalRequest) &&
+    !isPublicAuthPath(requestUrl)
+  )
+}
+
+function shouldRefreshToken(error: AxiosError) {
+  const originalRequest = error.config as RetriableRequestConfig | undefined
+
+  return (
     !originalRequest?.isRetry &&
-    !isPublicAuthPath(requestUrl) &&
     Boolean(getRefreshToken())
   )
 }
@@ -117,6 +128,11 @@ function redirectToLogin() {
 
   const redirect = encodeURIComponent(currentPath)
   window.location.assign(`${ROUTE_PATHS.login}?redirect=${redirect}`)
+}
+
+function handleAuthExpired() {
+  clearAuthTokens()
+  redirectToLogin()
 }
 
 async function refreshTokens() {
