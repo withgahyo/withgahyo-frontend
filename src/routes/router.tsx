@@ -29,6 +29,7 @@ import NotificationPage from '../pages/notification/NotificationPage'
 import ReviewPage from '../pages/review/ReviewPage'
 import NotFoundPage from '../pages/not-found/NotFoundPage'
 
+import AuthGuard from './AuthGuard'
 import { ROUTE_PATHS } from './routePaths'
 
 export const router = createBrowserRouter([
@@ -51,56 +52,66 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        element: <MainTabLayout />,
+        element: <AuthGuard />,
         children: [
-          { path: ROUTE_PATHS.home, element: <HomePage /> },
-          { path: ROUTE_PATHS.popular, element: <PopularPage /> },
-          { path: ROUTE_PATHS.albums, element: <AlbumsPage /> },
-          { path: ROUTE_PATHS.mypage, element: <MyPage /> },
+          {
+            element: <MainTabLayout />,
+            children: [
+              { path: ROUTE_PATHS.home, element: <HomePage /> },
+              { path: ROUTE_PATHS.popular, element: <PopularPage /> },
+              { path: ROUTE_PATHS.albums, element: <AlbumsPage /> },
+              { path: ROUTE_PATHS.mypage, element: <MyPage /> },
+            ],
+          },
         ],
       },
       {
-        element: <FlowLayout />,
+        element: <AuthGuard />,
         children: [
           {
-            path: ROUTE_PATHS.onboardingDuration,
-            element: <OnboardingDurationPage />,
-          },
-          {
-            path: ROUTE_PATHS.onboardingTourism,
-            element: <OnboardingTourismPage />,
-          },
-          {
-            path: ROUTE_PATHS.onboardingFood,
-            element: <OnboardingFoodPage />,
-          },
-          {
-            path: ROUTE_PATHS.onboardingCondition,
-            element: <OnboardingConditionPage />,
-          },
-          {
-            path: ROUTE_PATHS.onboardingComplete,
-            element: <OnboardingCompletePage />,
-          },
+            element: <FlowLayout />,
+            children: [
+              {
+                path: ROUTE_PATHS.onboardingDuration,
+                element: <OnboardingDurationPage />,
+              },
+              {
+                path: ROUTE_PATHS.onboardingTourism,
+                element: <OnboardingTourismPage />,
+              },
+              {
+                path: ROUTE_PATHS.onboardingFood,
+                element: <OnboardingFoodPage />,
+              },
+              {
+                path: ROUTE_PATHS.onboardingCondition,
+                element: <OnboardingConditionPage />,
+              },
+              {
+                path: ROUTE_PATHS.onboardingComplete,
+                element: <OnboardingCompletePage />,
+              },
 
-          {
-            path: ROUTE_PATHS.courseCreate,
-            element: <CourseCreatePage />,
-          },
+              {
+                path: ROUTE_PATHS.courseCreate,
+                element: <CourseCreatePage />,
+              },
 
-          {
-            path: '/courses/generating/:generationId',
-            element: <CourseGeneratingPage />,
-          },
-          {
-            path: '/courses/recommendations/:generationId',
-            element: <CourseRecommendationsPage />,
-          },
-          { path: '/courses/:courseId', element: <CourseDetailPage /> },
+              {
+                path: '/courses/generating/:generationId',
+                element: <CourseGeneratingPage />,
+              },
+              {
+                path: '/courses/recommendations/:generationId',
+                element: <CourseRecommendationsPage />,
+              },
+              { path: '/courses/:courseId', element: <CourseDetailPage /> },
 
-          { path: '/albums/:albumId', element: <AlbumDetailPage /> },
-          { path: ROUTE_PATHS.notifications, element: <NotificationPage /> },
-          { path: '/reviews/:courseId', element: <ReviewPage /> },
+              { path: '/albums/:albumId', element: <AlbumDetailPage /> },
+              { path: ROUTE_PATHS.notifications, element: <NotificationPage /> },
+              { path: '/reviews/:courseId', element: <ReviewPage /> },
+            ],
+          },
         ],
       },
       { index: true, element: <Navigate to={ROUTE_PATHS.splash} replace /> },
