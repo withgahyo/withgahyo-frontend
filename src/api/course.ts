@@ -64,6 +64,26 @@ export interface CourseFamilyMembersResponse {
   familyMembers: CourseFamilyMemberResponse[]
 }
 
+export interface FamilyMemberCandidateResponse {
+  userId: number
+  nickname: string
+  profileImageUrl: string | null
+  maskedEmail: string
+  alreadyConnected: boolean
+}
+
+export interface ConnectFamilyMemberRequest {
+  familyUserId: number
+  relationship: string
+}
+
+export interface ConnectFamilyMemberResponse {
+  familyMemberId: number
+  nickname: string
+  relationship: string
+  profileImageUrl: string | null
+}
+
 export interface CreateCourseRequest {
   title: string
   areaCode: string
@@ -128,6 +148,26 @@ export async function getCourseKeywordSuggestions() {
 export async function getCourseFamilyMembers() {
   const response = await apiClient.get<BackendApiResponse<CourseFamilyMembersResponse>>(
     '/api/v1/users/me/family-members',
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function findFamilyMemberCandidate(email: string) {
+  const response = await apiClient.get<BackendApiResponse<FamilyMemberCandidateResponse>>(
+    '/api/v1/family/members/candidates',
+    {
+      params: { email },
+    },
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function connectFamilyMember(request: ConnectFamilyMemberRequest) {
+  const response = await apiClient.post<BackendApiResponse<ConnectFamilyMemberResponse>>(
+    '/api/v1/family/members',
+    request,
   )
 
   return unwrapApiResponse(response.data)

@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
   createCourse,
+  connectFamilyMember,
+  findFamilyMemberCandidate,
   getCourseFamilyMembers,
   getCourseKeywordSuggestions,
   searchPlaces,
@@ -16,6 +18,7 @@ import KeywordSelectSection from '../../features/course/components/KeywordSelect
 import PreferredPlaceSection from '../../features/course/components/PreferredPlaceSection'
 import TravelDateCalendar from '../../features/course/components/TravelDateCalendar'
 import FamilyMemberSelector from '../../features/course/components/FamilyMemberSelector'
+import FamilyMemberConnectSheet from '../../features/course/components/FamilyMemberConnectSheet'
 import { queryKeys } from '../../constants/queryKeys'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 import { isSameDay } from '../../features/course/utils/calendarUtils'
@@ -45,8 +48,12 @@ function formatDate(date: Date) {
 
 function CourseCreatePage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [form, setForm] = useState<CourseCreateFormState>(INITIAL_FORM_STATE)
   const [placeSearchQuery, setPlaceSearchQuery] = useState('')
+  const [isFamilySheetOpen, setIsFamilySheetOpen] = useState(false)
+  const [familyEmail, setFamilyEmail] = useState('')
+  const [familyRelationship, setFamilyRelationship] = useState('부모')
 
   const regionsQuery = useQuery({
     queryKey: queryKeys.courseRegions,
@@ -78,6 +85,22 @@ function CourseCreatePage() {
     mutationFn: createCourse,
     onSuccess: (response) => {
       navigate(ROUTE_PATHS.courseGenerating(String(response.courseId)))
+    },
+  })
+  const findFamilyCandidateMutation = useMutation({
+    mutationFn: findFamilyMemberCandidate,
+  })
+  const connectFamilyMemberMutation = useMutation({
+    mutationFn: connectFamilyMember,
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.courseFamilyMembers })
+      setForm((prev) => ({
+        ...prev,
+        familyMemberIds: prev.familyMemberIds.includes(response.familyMemberId)
+          ? prev.familyMemberIds
+          : [...prev.familyMemberIds, response.familyMemberId],
+      }))
+      closeFamilySheet()
     },
   })
 
@@ -169,6 +192,31 @@ function CourseCreatePage() {
     })
   }
 
+  const closeFamilySheet = () => {
+    setIsFamilySheetOpen(false)
+    setFamilyEmail('')
+    setFamilyRelationship('부모')
+    findFamilyCandidateMutation.reset()
+    connectFamilyMemberMutation.reset()
+  }
+
+  const handleFindFamilyCandidate = () => {
+    const email = familyEmail.trim()
+    if (!email) return
+    connectFamilyMemberMutation.reset()
+    findFamilyCandidateMutation.mutate(email)
+  }
+
+  const handleConnectFamilyMember = () => {
+    const candidate = findFamilyCandidateMutation.data
+    if (!candidate || candidate.alreadyConnected) return
+
+    connectFamilyMemberMutation.mutate({
+      familyUserId: candidate.userId,
+      relationship: familyRelationship,
+    })
+  }
+
   return (
     <div className="relative -mt-[env(safe-area-inset-top)] -mb-[env(safe-area-inset-bottom)] flex h-app flex-col overflow-hidden">
       <CourseCreateHeader />
@@ -229,6 +277,7 @@ function CourseCreatePage() {
                 familyMemberIds: toggleId(prev.familyMemberIds, id),
               }))
             }
+            onAddClick={() => setIsFamilySheetOpen(true)}
           />
 
           {createCourseMutation.isError && (
@@ -244,6 +293,26 @@ function CourseCreatePage() {
           </PrimaryButton>
         </div>
       </div>
+
+      <FamilyMemberConnectSheet
+        isOpen={isFamilySheetOpen}
+        email={familyEmail}
+        candidate={findFamilyCandidateMutation.data ?? null}
+        relationship={familyRelationship}
+        isFinding={findFamilyCandidateMutation.isPending}
+        isConnecting={connectFamilyMemberMutation.isPending}
+        findError={findFamilyCandidateMutation.error ?? null}
+        connectError={connectFamilyMemberMutation.error ?? null}
+        onEmailChange={(email) => {
+          setFamilyEmail(email)
+          findFamilyCandidateMutation.reset()
+          connectFamilyMemberMutation.reset()
+        }}
+        onRelationshipChange={setFamilyRelationship}
+        onFind={handleFindFamilyCandidate}
+        onConnect={handleConnectFamilyMember}
+        onClose={closeFamilySheet}
+      />
     </div>
   )
 }

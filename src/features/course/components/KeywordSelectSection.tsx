@@ -24,6 +24,11 @@ function KeywordSelectSection({
   const [isOpen, setIsOpen] = useState(false)
   const selectedKeywords = keywords.filter((keyword) => selectedIds.includes(keyword.id))
 
+  const handleSelectKeyword = (id: number) => {
+    onToggle(id)
+    setIsOpen(false)
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <FormSectionLabel htmlFor={FIELD_ID}>관심 키워드 선택</FormSectionLabel>
@@ -65,7 +70,7 @@ function KeywordSelectSection({
                       type="button"
                       role="option"
                       aria-selected={isSelected}
-                      onClick={() => onToggle(keyword.id)}
+                      onClick={() => handleSelectKeyword(keyword.id)}
                       className={`w-full px-4 py-3 text-left text-sm ${
                         isSelected
                           ? 'bg-brand-blue/10 text-brand-blue'

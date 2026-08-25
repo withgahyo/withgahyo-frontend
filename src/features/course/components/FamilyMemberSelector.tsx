@@ -8,6 +8,7 @@ interface FamilyMemberSelectorProps {
   errorMessage?: string
   selectedIds: number[]
   onToggle: (id: number) => void
+  onAddClick: () => void
 }
 
 function FamilyMemberSelector({
@@ -16,6 +17,7 @@ function FamilyMemberSelector({
   errorMessage,
   selectedIds,
   onToggle,
+  onAddClick,
 }: FamilyMemberSelectorProps) {
   return (
     <div className="flex flex-col gap-3">
@@ -59,8 +61,7 @@ function FamilyMemberSelector({
 
         <button
           type="button"
-          // TODO: 가족 구성원 추가 페이지/API 연동 후 실제 이동 처리
-          onClick={() => {}}
+          onClick={onAddClick}
           aria-label="구성원 추가하기"
           className="flex shrink-0 flex-col items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
         >
