@@ -6,6 +6,7 @@ import {
   getRefreshToken,
   setAuthTokens,
 } from '../features/auth/utils/tokenStorage'
+import { ROUTE_PATHS } from '../routes/routePaths'
 import type { AuthTokenResponse } from './auth'
 
 interface RetriableRequestConfig extends InternalAxiosRequestConfig {
@@ -66,7 +67,12 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (axios.isAxiosError(error) && shouldRefreshToken(error)) {
+    if (axios.isAxiosError(error) && isUnauthorizedProtectedRequest(error)) {
+      if (!shouldRefreshToken(error)) {
+        handleAuthExpired()
+        return Promise.reject(toApiError(error))
+      }
+
       try {
         const tokens = await refreshTokens()
         const originalRequest = error.config as RetriableRequestConfig
@@ -77,7 +83,7 @@ apiClient.interceptors.response.use(
 
         return apiClient(originalRequest)
       } catch (refreshError) {
-        clearAuthTokens()
+        handleAuthExpired()
         return Promise.reject(toApiError(refreshError))
       }
     }
@@ -86,21 +92,47 @@ apiClient.interceptors.response.use(
   },
 )
 
-function shouldRefreshToken(error: AxiosError) {
+function isUnauthorizedProtectedRequest(error: AxiosError) {
   const originalRequest = error.config as RetriableRequestConfig | undefined
   const requestUrl = originalRequest?.url ?? ''
 
   return (
     error.response?.status === 401 &&
     Boolean(originalRequest) &&
+    !isPublicAuthPath(requestUrl)
+  )
+}
+
+function shouldRefreshToken(error: AxiosError) {
+  const originalRequest = error.config as RetriableRequestConfig | undefined
+
+  return (
     !originalRequest?.isRetry &&
-    !isPublicAuthPath(requestUrl) &&
     Boolean(getRefreshToken())
   )
 }
 
 function isPublicAuthPath(url: string) {
   return PUBLIC_AUTH_PATHS.some((path) => url.includes(path))
+}
+
+function redirectToLogin() {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const currentPath = `${window.location.pathname}${window.location.search}`
+  if (currentPath.startsWith(ROUTE_PATHS.login)) {
+    return
+  }
+
+  const redirect = encodeURIComponent(currentPath)
+  window.location.assign(`${ROUTE_PATHS.login}?redirect=${redirect}`)
+}
+
+function handleAuthExpired() {
+  clearAuthTokens()
+  redirectToLogin()
 }
 
 async function refreshTokens() {

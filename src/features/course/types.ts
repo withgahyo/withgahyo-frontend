@@ -1,31 +1,34 @@
 export interface RegionOption {
   id: string
   label: string
+  areaCode: string
+  sigunguCode: string
 }
 
 export interface KeywordOption {
-  id: string
+  id: number
   label: string
 }
 
 export interface PlaceOption {
-  id: string
+  id: number
   label: string
+  address: string
 }
 
 export interface FamilyMemberOption {
-  id: string
+  id: number
   name: string
+  relationship: string
+  profileImageUrl: string | null
 }
-
-export type PlaceOptionsByRegion = Record<string, PlaceOption[]>
 
 export interface CourseCreateFormState {
   courseName: string
   region: RegionOption | null
-  keywordIds: string[]
+  keywordIds: number[]
   preferredPlaces: PlaceOption[]
   startDate: Date | null
   endDate: Date | null
-  familyMemberIds: string[]
+  familyMemberIds: number[]
 }
