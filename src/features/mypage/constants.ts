@@ -6,7 +6,6 @@ import {
   Heart,
   LogOut,
   Settings,
-  UserPlus,
 } from 'lucide-react'
 
 export const PROFILE = {
@@ -14,13 +13,7 @@ export const PROFILE = {
   emptyEmail: '이메일 정보 없음',
 } as const
 
-export const FAMILY_MENU_ITEMS = [
-  {
-    label: '가족 구성원 추가하기',
-    description: '함께 여행할 가족을 초대해요',
-    Icon: UserPlus,
-    TrailingIcon: ChevronRight,
-  },
+export const TRAVEL_MENU_ITEMS = [
   {
     label: '나의 여행 취향 관리',
     description: '추천에 쓰이는 선호 조건을 바꿔요',

@@ -147,7 +147,7 @@ export async function getCourseKeywordSuggestions() {
 
 export async function getCourseFamilyMembers() {
   const response = await apiClient.get<BackendApiResponse<CourseFamilyMembersResponse>>(
-    '/api/v1/users/me/family-members',
+    '/api/v1/family/members',
   )
 
   return unwrapApiResponse(response.data)
@@ -155,7 +155,7 @@ export async function getCourseFamilyMembers() {
 
 export async function findFamilyMemberCandidate(email: string) {
   const response = await apiClient.get<BackendApiResponse<FamilyMemberCandidateResponse>>(
-    '/api/v1/family/members/candidates',
+    '/api/v1/family/members',
     {
       params: { email },
     },
@@ -168,6 +168,14 @@ export async function connectFamilyMember(request: ConnectFamilyMemberRequest) {
   const response = await apiClient.post<BackendApiResponse<ConnectFamilyMemberResponse>>(
     '/api/v1/family/members',
     request,
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function disconnectFamilyMember(familyMemberId: number) {
+  const response = await apiClient.delete<BackendApiResponse<null>>(
+    `/api/v1/family/members/${familyMemberId}`,
   )
 
   return unwrapApiResponse(response.data)
