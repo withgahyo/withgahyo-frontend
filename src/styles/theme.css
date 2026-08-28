@@ -4,6 +4,8 @@
   --color-brand-lime: #d7ff64;
   --color-ink: #14142b;
   --color-app-backdrop: #f5f5f5;
+  /* 흰 카드가 위에서 자연스럽게 떠 보이도록 하는 아주 연한 off-white 표면색 */
+  --color-surface-muted: #f7f8fa;
 
   /* Font */
   --font-sans:
@@ -19,4 +21,44 @@
 
   /* Shadow */
   --shadow-fab: 0 8px 20px -4px rgb(48 68 255 / 0.35);
+
+  /* Animation — 바텀시트 열림/닫힘.
+     닫힘은 both로 끝 상태(화면 밖 / 투명)를 유지한 채 언마운트를 기다린다. */
+  --animate-sheet-in: sheet-in 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-sheet-out: sheet-out 220ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  --animate-overlay-in: overlay-in 260ms ease-out;
+  --animate-overlay-out: overlay-out 220ms ease-out both;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes sheet-out {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes overlay-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes overlay-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 }

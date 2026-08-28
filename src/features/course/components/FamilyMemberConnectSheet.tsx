@@ -36,6 +36,8 @@ function FamilyMemberConnectSheet({
   onConnect,
   onClose,
 }: FamilyMemberConnectSheetProps) {
+  // isOpen이 false로 바뀌어도 닫힘 애니메이션이 끝날 때까지 DOM에 남겨둔다.
+  const [isRendered, setIsRendered] = useState(isOpen)
   const [isRelationshipOpen, setIsRelationshipOpen] = useState(false)
   const [relationshipDropdownStyle, setRelationshipDropdownStyle] = useState({
     left: 0,
@@ -85,8 +87,23 @@ function FamilyMemberConnectSheet({
     }
   }, [isRelationshipOpen])
 
-  if (!isOpen) return null
+  // prop → state 동기화는 렌더 중에 처리한다(effect 아님): 열리면 즉시 마운트해 slide-in을 재생.
+  if (isOpen && !isRendered) {
+    setIsRendered(true)
+  }
 
+  // 닫히면 slide-out 애니메이션이 끝난 뒤 언마운트한다.
+  // (관계 드롭다운은 바깥 pointerdown 리스너가 같은 클릭에서 알아서 닫는다.)
+  useEffect(() => {
+    if (isOpen || !isRendered) return
+
+    const timer = window.setTimeout(() => setIsRendered(false), 240)
+    return () => window.clearTimeout(timer)
+  }, [isOpen, isRendered])
+
+  if (!isRendered) return null
+
+  const isClosing = !isOpen
   const canFind = Boolean(email.trim()) && !isFinding
   const canConnect =
     Boolean(candidate) &&
@@ -95,11 +112,13 @@ function FamilyMemberConnectSheet({
     !isConnecting
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-end">
       <button
         type="button"
         aria-label="가족 구성원 연결 닫기"
-        className="absolute inset-0 cursor-default"
+        className={`absolute inset-0 cursor-default bg-black/40 motion-reduce:animate-none ${
+          isClosing ? 'animate-overlay-out' : 'animate-overlay-in'
+        }`}
         onClick={onClose}
       />
 
@@ -107,7 +126,9 @@ function FamilyMemberConnectSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="family-connect-title"
-        className="relative w-full rounded-t-[28px] bg-white px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-5 shadow-xl"
+        className={`relative w-full rounded-t-card bg-white px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-5 shadow-xl motion-reduce:animate-none ${
+          isClosing ? 'animate-sheet-out' : 'animate-sheet-in'
+        }`}
       >
         <div className="mb-5 flex items-center justify-between">
           <h2 id="family-connect-title" className="text-lg font-semibold text-ink">

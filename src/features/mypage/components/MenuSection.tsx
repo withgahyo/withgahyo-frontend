@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import MenuItemButton from './MenuItemButton'
 import MypageCard from './MypageCard'
@@ -18,9 +19,11 @@ interface MenuSectionProps {
 }
 
 function MenuSection({ title, items }: MenuSectionProps) {
+  const headingId = useId()
+
   return (
-    <section aria-labelledby={`${title}-heading`}>
-      <h2 id={`${title}-heading`} className="mb-3 px-1 text-sm font-bold text-ink/55">
+    <section aria-labelledby={headingId}>
+      <h2 id={headingId} className="mb-3 px-1 text-sm font-bold text-ink/55">
         {title}
       </h2>
       <MypageCard className="px-5">

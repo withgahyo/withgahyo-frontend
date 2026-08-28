@@ -8,7 +8,7 @@ interface MypageCardProps {
 function MypageCard({ children, className = '' }: MypageCardProps) {
   return (
     <section
-      className={`rounded-3xl bg-white shadow-[0_10px_30px_-20px_rgb(20_20_43/0.45)] ${className}`}
+      className={`rounded-card border border-ink/6 bg-white shadow-[0_2px_12px_-6px_rgb(20_20_43/0.12)] ${className}`}
     >
       {children}
     </section>

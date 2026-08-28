@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { SETTING_MENU_ITEMS, TRAVEL_MENU_ITEMS } from '../../features/mypage/constants'
+import { MY_INFO_MENU_ITEMS, SETTING_MENU_ITEMS } from '../../features/mypage/constants'
 import MenuSection from '../../features/mypage/components/MenuSection'
 import FamilyManagementSection from '../../features/mypage/components/FamilyManagementSection'
-import ProfileCard from '../../features/mypage/components/ProfileCard'
+import MypageHero from '../../features/mypage/components/MypageHero'
 import WithdrawButton from '../../features/mypage/components/WithdrawButton'
 import { useLogoutMutation, useWithdrawMutation } from '../../features/auth/hooks/useAuthMutations'
 import { getStoredAuthUser } from '../../features/auth/utils/tokenStorage'
@@ -116,31 +116,35 @@ function MyPage() {
   }
 
   return (
-    <main className="min-h-app bg-[#F6F7F2] px-5 pb-32 pt-6">
-      <header className="mb-6 flex items-center justify-center">
-        <h1 className="text-lg font-extrabold text-ink">마이페이지</h1>
-      </header>
+    // Home과 동일한 배경 bleed 패턴: 위로 Safe Area(top)까지 Blue를 확장하고,
+    // 아래 흰 Content Sheet가 BottomNavigation(fixed, 4.5rem) 뒤까지 이어지도록
+    // 시트가 nav 높이 + 마지막 콘텐츠 여백(2.5rem, Home 최하단 섹션과 동일)을 직접 가진다.
+    <main className="relative -mt-[env(safe-area-inset-top)] flex min-h-app flex-col bg-brand-blue pt-[env(safe-area-inset-top)]">
+      <MypageHero user={authUser} />
 
-      <div className="space-y-5">
-        <ProfileCard user={authUser} />
-        <FamilyManagementSection
-          familyMembers={familyMembersQuery.data?.familyMembers ?? []}
-          isLoading={familyMembersQuery.isLoading}
-          errorMessage={familyMembersQuery.isError ? '가족 구성원을 불러오지 못했습니다.' : undefined}
-          removingId={
-            disconnectFamilyMemberMutation.isPending
-              ? disconnectFamilyMemberMutation.variables ?? null
-              : null
-          }
-          onAddClick={() => setIsFamilySheetOpen(true)}
-          onRemove={(familyMemberId) => {
-            if (!window.confirm('가족 연결을 해제할까요?')) return
-            disconnectFamilyMemberMutation.mutate(familyMemberId)
-          }}
-        />
-        <MenuSection title="여행 관리" items={TRAVEL_MENU_ITEMS} />
-        <MenuSection title="계정 · 앱 설정" items={settingMenuItems} />
-        <WithdrawButton onClick={handleWithdraw} disabled={isAuthActionPending} />
+      <div className="relative -mt-6 flex-1 rounded-t-card bg-surface-muted px-6 pb-[calc(4.5rem+2.5rem+env(safe-area-inset-bottom))] pt-7">
+        <div className="space-y-8">
+          <MenuSection title="내 정보" items={MY_INFO_MENU_ITEMS} />
+          <FamilyManagementSection
+            familyMembers={familyMembersQuery.data?.familyMembers ?? []}
+            isLoading={familyMembersQuery.isLoading}
+            errorMessage={
+              familyMembersQuery.isError ? '가족 구성원을 불러오지 못했습니다.' : undefined
+            }
+            removingId={
+              disconnectFamilyMemberMutation.isPending
+                ? disconnectFamilyMemberMutation.variables ?? null
+                : null
+            }
+            onAddClick={() => setIsFamilySheetOpen(true)}
+            onRemove={(familyMemberId) => {
+              if (!window.confirm('가족 연결을 해제할까요?')) return
+              disconnectFamilyMemberMutation.mutate(familyMemberId)
+            }}
+          />
+          <MenuSection title="설정" items={settingMenuItems} />
+          <WithdrawButton onClick={handleWithdraw} disabled={isAuthActionPending} />
+        </div>
       </div>
 
       <FamilyMemberConnectSheet

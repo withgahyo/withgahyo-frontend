@@ -22,7 +22,7 @@ function FamilyManagementSection({
   return (
     <section aria-labelledby="family-management-heading">
       <h2 id="family-management-heading" className="mb-3 px-1 text-sm font-bold text-ink/55">
-        가족 관리
+        가족
       </h2>
 
       <MypageCard className="overflow-hidden px-5">

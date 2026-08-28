@@ -21,10 +21,12 @@ function BottomNavigation() {
     // Plus 버튼은 nav의 형제로 분리한다. nav에 걸리는 mask(notch)가 자식 전체에
     // 적용되기 때문에, 버튼이 nav의 자식이면 notch 구멍 안에서 버튼 아랫부분까지
     // 함께 마스킹되어 사라진다.
-    <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-[430px] -translate-x-1/2">
+    // 위로 드리우는 분리용 shadow는 wrapper(비마스킹)에 둔다.
+    // nav 자체는 notch용 maskImage가 걸려 있어 box-shadow가 잘려 거의 보이지 않는다.
+    <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-[430px] -translate-x-1/2 shadow-[0_-4px_16px_-6px_rgb(20_20_43/0.12)]">
       <nav
         aria-label="주요 메뉴"
-        className={`relative rounded-t-card bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-4px_rgb(20_20_43/0.08)]`}
+        className="relative rounded-t-card bg-white pb-[env(safe-area-inset-bottom)]"
         style={{
           maskImage: NOTCH_MASK,
           WebkitMaskImage: NOTCH_MASK,
