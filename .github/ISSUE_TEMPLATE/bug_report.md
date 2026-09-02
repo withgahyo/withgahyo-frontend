@@ -2,7 +2,7 @@
 name: 🐛 Bug Report
 about: 버그 수정 이슈를 작성합니다.
 title: "[Fix] "
-labels: Fix
+labels: fix
 assignees: ''
 ---
 
