@@ -1,10 +1,10 @@
 import ImageCard from '../../../components/common/ImageCard'
-import type { PreferenceImageOption } from '../constants'
+import type { PreferenceOption } from '../api/types'
 
 interface OnboardingPreferenceGridProps {
-  options: PreferenceImageOption[]
-  selectedIds: string[]
-  onToggle: (id: string) => void
+  options: PreferenceOption[]
+  selectedIds: number[]
+  onToggle: (id: number) => void
 }
 
 function OnboardingPreferenceGrid({
@@ -17,8 +17,8 @@ function OnboardingPreferenceGrid({
       {options.map((option) => (
         <ImageCard
           key={option.id}
-          label={option.label}
-          imageSrc={option.imageSrc}
+          label={option.name}
+          imageSrc={null}
           selected={selectedIds.includes(option.id)}
           onClick={() => onToggle(option.id)}
         />

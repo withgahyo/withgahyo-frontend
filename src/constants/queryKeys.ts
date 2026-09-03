@@ -5,6 +5,9 @@ export const queryKeys = {
 
   notifications: ['notifications'] as const,
 
+  onboardingTourismOptions: ['onboarding', 'tourism-options'] as const,
+  onboardingFoodOptions: ['onboarding', 'food-options'] as const,
+
   course: (courseId: number) => ['courses', courseId] as const,
   courseRegions: ['course', 'regions'] as const,
   coursePlaces: (areaCode: string, sigunguCode: string, query: string) =>

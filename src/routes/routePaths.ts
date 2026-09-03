@@ -4,7 +4,6 @@ export const ROUTE_PATHS = {
   kakaoOAuthCallback: '/oauth/kakao/callback',
   googleOAuthCallback: '/oauth/google/callback',
 
-  onboardingDuration: '/onboarding/duration',
   onboardingTourism: '/onboarding/tourism',
   onboardingFood: '/onboarding/food',
   onboardingCondition: '/onboarding/condition',

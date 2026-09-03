@@ -87,6 +87,19 @@ export function setAuthUser(user: AuthUser) {
   window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))
 }
 
+/**
+ * 온보딩 완료 API가 성공한 뒤, 저장된 auth user의 onboardingCompleted를 서버 상태와 맞춘다.
+ * 로그인 시 저장한 값이 세션 내내 stale하게 남는 것을 막는다.
+ */
+export function markOnboardingCompleted() {
+  const storedUser = getStoredAuthUser()
+  if (!storedUser) {
+    return
+  }
+
+  setAuthUser({ ...storedUser, onboardingCompleted: true })
+}
+
 export function clearAuthTokens() {
   if (!canUseStorage()) {
     return

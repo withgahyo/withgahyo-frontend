@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-function toggleId(ids: string[], id: string) {
+function toggleId<T>(ids: T[], id: T) {
   return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]
 }
 
@@ -9,9 +9,8 @@ function toggleSingle(current: string | null, id: string) {
 }
 
 interface OnboardingState {
-  durationId: string | null
-  tourismPreferenceIds: string[]
-  foodPreferenceIds: string[]
+  tourismPreferenceIds: number[]
+  foodPreferenceIds: number[]
   walkingTimeId: string | null
   restNeedId: string | null
   stairsToleranceId: string | null
@@ -19,19 +18,30 @@ interface OnboardingState {
   mealCautionId: string | null
   burdensomeFoodIds: string[]
 
-  setDuration: (id: string) => void
-  toggleTourismPreference: (id: string) => void
-  toggleFoodPreference: (id: string) => void
+  toggleTourismPreference: (id: number) => void
+  toggleFoodPreference: (id: number) => void
   setWalkingTime: (id: string) => void
   setRestNeed: (id: string) => void
   setStairsTolerance: (id: string) => void
   toggleFacility: (id: string) => void
   setMealCaution: (id: string) => void
   toggleBurdensomeFood: (id: string) => void
+  resetOnboarding: () => void
 }
 
-export const useOnboardingStore = create<OnboardingState>((set) => ({
-  durationId: null,
+type OnboardingSelectionSnapshot = Pick<
+  OnboardingState,
+  | 'tourismPreferenceIds'
+  | 'foodPreferenceIds'
+  | 'walkingTimeId'
+  | 'restNeedId'
+  | 'stairsToleranceId'
+  | 'facilityIds'
+  | 'mealCautionId'
+  | 'burdensomeFoodIds'
+>
+
+const INITIAL_SELECTION: OnboardingSelectionSnapshot = {
   tourismPreferenceIds: [],
   foodPreferenceIds: [],
   walkingTimeId: null,
@@ -40,8 +50,11 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
   facilityIds: [],
   mealCautionId: null,
   burdensomeFoodIds: [],
+}
 
-  setDuration: (id) => set({ durationId: id }),
+export const useOnboardingStore = create<OnboardingState>((set) => ({
+  ...INITIAL_SELECTION,
+
   toggleTourismPreference: (id) =>
     set((state) => ({
       tourismPreferenceIds: toggleId(state.tourismPreferenceIds, id),
@@ -66,4 +79,5 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     set((state) => ({
       burdensomeFoodIds: toggleId(state.burdensomeFoodIds, id),
     })),
+  resetOnboarding: () => set({ ...INITIAL_SELECTION }),
 }))

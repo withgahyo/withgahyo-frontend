@@ -2,12 +2,20 @@ import { Check } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTE_PATHS } from '../../routes/routePaths'
+import { useOnboardingStore } from '../../stores/onboardingStore'
 
 const NAVIGATE_DELAY_MS = 1500
 
 function OnboardingCompletePage() {
   const navigate = useNavigate()
+  const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding)
   const [isVisible, setIsVisible] = useState(false)
+
+  // 온보딩 성공 흐름에서만 이 페이지에 도달한다. ConditionPage가 언마운트된 뒤 폼 상태를
+  // 초기화하므로 ConditionPage의 Step Guard가 빈 선택값을 관측해 되돌리는 일이 없다.
+  useEffect(() => {
+    resetOnboarding()
+  }, [resetOnboarding])
 
   useEffect(() => {
     const rafId = requestAnimationFrame(() => setIsVisible(true))

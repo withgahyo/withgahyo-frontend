@@ -1,7 +1,7 @@
-const TOTAL_STEPS = 4
+const TOTAL_STEPS = 3
 
 interface OnboardingProgressBarProps {
-  currentStep: 1 | 2 | 3 | 4
+  currentStep: 1 | 2 | 3
 }
 
 function OnboardingProgressBar({ currentStep }: OnboardingProgressBarProps) {
