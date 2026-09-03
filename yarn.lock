@@ -533,6 +533,11 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
+"@types/kakaomaps@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@types/kakaomaps/-/kakaomaps-1.1.7.tgz#c65f9aee749a48d9b2f00a2cf2068d1043ef4f75"
+  integrity sha512-351kj/zI1fyf2Gc4MhNRCc4EDxO/UN+66bsagNAj79GXVlngXsCyGgDZuVhUo1mo5mxRHSrS//Wiu+Pg9TQFiw==
+
 "@types/node@^24.13.3":
   version "24.13.3"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-24.13.3.tgz#49f18bd3c647866dcda51a0756c145e14590ce16"
