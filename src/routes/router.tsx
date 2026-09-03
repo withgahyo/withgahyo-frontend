@@ -8,7 +8,6 @@ import SplashPage from '../pages/splash/SplashPage'
 import LoginPage from '../pages/login/LoginPage'
 import OAuthCallbackPage from '../pages/login/OAuthCallbackPage'
 
-import OnboardingDurationPage from '../pages/onboarding/OnboardingDurationPage'
 import OnboardingTourismPage from '../pages/onboarding/OnboardingTourismPage'
 import OnboardingFoodPage from '../pages/onboarding/OnboardingFoodPage'
 import OnboardingConditionPage from '../pages/onboarding/OnboardingConditionPage'
@@ -71,10 +70,6 @@ export const router = createBrowserRouter([
           {
             element: <FlowLayout />,
             children: [
-              {
-                path: ROUTE_PATHS.onboardingDuration,
-                element: <OnboardingDurationPage />,
-              },
               {
                 path: ROUTE_PATHS.onboardingTourism,
                 element: <OnboardingTourismPage />,

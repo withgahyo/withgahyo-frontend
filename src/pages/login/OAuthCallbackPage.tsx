@@ -40,8 +40,12 @@ function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) {
       authorizationCode: code,
       redirectUri: getOAuthRedirectUri(provider),
     })
-      .then(() => {
-        navigate(ROUTE_PATHS.home, { replace: true })
+      .then((result) => {
+        const onboardingCompleted = result.user?.onboardingCompleted ?? false
+        navigate(
+          onboardingCompleted ? ROUTE_PATHS.home : ROUTE_PATHS.onboardingTourism,
+          { replace: true },
+        )
       })
       .catch(() => {
         clearAuthTokens()

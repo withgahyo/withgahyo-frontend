@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import OnboardingProgressBar from './OnboardingProgressBar'
 
 interface OnboardingStepLayoutProps {
-  currentStep: 1 | 2 | 3 | 4
+  currentStep: 1 | 2 | 3
   children: ReactNode
   footer: ReactNode
 }

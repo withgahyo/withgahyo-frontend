@@ -1,10 +1,13 @@
 import { Accessibility, Armchair, Clock, Mountain, Utensils } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PrimaryButton from '../../components/common/PrimaryButton'
 import SelectChip from '../../components/common/SelectChip'
 import OnboardingHeading from '../../features/onboarding/components/OnboardingHeading'
 import OnboardingStepLayout from '../../features/onboarding/components/OnboardingStepLayout'
+import { useSaveOnboardingMutation } from '../../features/onboarding/hooks/useOnboardingQueries'
+import { toOnboardingSaveRequest } from '../../features/onboarding/mappers/toOnboardingSaveRequest'
 import {
   BURDENSOME_FOOD_OPTIONS,
   FACILITY_OPTIONS,
@@ -86,7 +89,10 @@ function ConditionGroup({
 
 function OnboardingConditionPage() {
   const navigate = useNavigate()
+  const saveOnboardingMutation = useSaveOnboardingMutation()
   const {
+    tourismPreferenceIds,
+    foodPreferenceIds,
     walkingTimeId,
     restNeedId,
     stairsToleranceId,
@@ -101,20 +107,64 @@ function OnboardingConditionPage() {
     toggleBurdensomeFood,
   } = useOnboardingStore((state) => state)
 
+  const hasTourismSelection = tourismPreferenceIds.length > 0
+  const hasFoodSelection = foodPreferenceIds.length > 0
+
+  useEffect(() => {
+    if (!hasTourismSelection) {
+      navigate(ROUTE_PATHS.onboardingTourism, { replace: true })
+    } else if (!hasFoodSelection) {
+      navigate(ROUTE_PATHS.onboardingFood, { replace: true })
+    }
+  }, [hasTourismSelection, hasFoodSelection, navigate])
+
+  if (!hasTourismSelection || !hasFoodSelection) {
+    return null
+  }
+
   const handleNext = () => {
-    // TODO: API 명세 확정 후 온보딩 저장 API 호출 → 성공 시 /onboarding/complete로 이동하는 구조로 변경
-    navigate(ROUTE_PATHS.onboardingComplete)
+    if (saveOnboardingMutation.isPending) {
+      return
+    }
+
+    const request = toOnboardingSaveRequest({
+      tourismPreferenceIds,
+      foodPreferenceIds,
+      walkingTimeId,
+      restNeedId,
+      stairsToleranceId,
+      mealCautionId,
+    })
+
+    saveOnboardingMutation.mutate(request, {
+      onSuccess: () => {
+        // 폼 상태 초기화는 완료 페이지(성공 흐름에서만 도달)가 담당한다.
+        // 여기서 초기화하면 아직 마운트된 이 페이지의 Step Guard가 빈 선택값을 관측해 되돌린다.
+        navigate(ROUTE_PATHS.onboardingComplete, { replace: true })
+      },
+    })
   }
 
   return (
     <OnboardingStepLayout
-      currentStep={4}
+      currentStep={3}
       footer={
         <div>
-          <PrimaryButton onClick={handleNext}>다음</PrimaryButton>
-          <p className="mt-3 text-center text-xs text-ink/50">
-            특별한 주의사항이 없으면, 다음으로 넘겨주세요.
-          </p>
+          <PrimaryButton
+            onClick={handleNext}
+            disabled={saveOnboardingMutation.isPending}
+          >
+            {saveOnboardingMutation.isPending ? '저장 중…' : '다음'}
+          </PrimaryButton>
+          {saveOnboardingMutation.isError ? (
+            <p className="mt-3 text-center text-xs text-red-600">
+              저장에 실패했어요. 잠시 후 다시 시도해주세요.
+            </p>
+          ) : (
+            <p className="mt-3 text-center text-xs text-ink/50">
+              특별한 주의사항이 없으면, 다음으로 넘겨주세요.
+            </p>
+          )}
         </div>
       }
     >
