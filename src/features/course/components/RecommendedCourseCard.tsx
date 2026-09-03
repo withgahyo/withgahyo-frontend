@@ -1,4 +1,6 @@
 import { Heart } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { ROUTE_PATHS } from '../../../routes/routePaths'
 import type { RecommendedCourse } from '../types'
 
 interface RecommendedCourseCardProps {
@@ -6,6 +8,8 @@ interface RecommendedCourseCardProps {
 }
 
 function RecommendedCourseCard({ course }: RecommendedCourseCardProps) {
+  const navigate = useNavigate()
+
   return (
     <article className="rounded-card border border-gray-100 bg-white p-4 shadow-[0_2px_16px_-8px_rgba(20,20,43,0.15)]">
       <div className="flex gap-3">
@@ -45,11 +49,10 @@ function RecommendedCourseCard({ course }: RecommendedCourseCardProps) {
       </div>
 
       <div className="mt-4 flex gap-2">
-        {/* TODO: 다음 PR에서 코스 상세 화면 구현 후 연결 */}
         <button
           type="button"
-          disabled
-          className="flex-1 whitespace-nowrap rounded-full border border-gray-300 px-1 py-2 text-xs font-semibold text-gray-400"
+          onClick={() => navigate(ROUTE_PATHS.courseDetail(course.id))}
+          className="flex-1 whitespace-nowrap rounded-full border border-gray-300 px-1 py-2 text-xs font-semibold text-ink transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
         >
           자세히 보기
         </button>
