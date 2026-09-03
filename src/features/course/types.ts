@@ -32,3 +32,13 @@ export interface CourseCreateFormState {
   endDate: Date | null
   familyMemberIds: number[]
 }
+
+export interface RecommendedCourse {
+  id: string
+  title: string
+  satisfaction: number
+  tags: string[]
+  totalDistanceKm: number
+  totalDurationMinutes: number
+  imageUrl?: string
+}

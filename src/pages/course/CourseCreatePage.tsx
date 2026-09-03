@@ -69,9 +69,10 @@ function CourseCreatePage() {
   })
   const placeQueryText = placeSearchQuery.trim()
   const placesQuery = useQuery({
-    queryKey: form.region && placeQueryText
-      ? queryKeys.coursePlaces(form.region.areaCode, form.region.sigunguCode, placeQueryText)
-      : queryKeys.coursePlaces('', '', ''),
+    queryKey:
+      form.region && placeQueryText
+        ? queryKeys.coursePlaces(form.region.areaCode, form.region.sigunguCode, placeQueryText)
+        : queryKeys.coursePlaces('', '', ''),
     queryFn: () =>
       searchPlaces({
         areaCode: form.region?.areaCode ?? '',
@@ -84,7 +85,9 @@ function CourseCreatePage() {
   const createCourseMutation = useMutation({
     mutationFn: createCourse,
     onSuccess: (response) => {
-      navigate(ROUTE_PATHS.courseGenerating(String(response.courseId)))
+      navigate(ROUTE_PATHS.courseGenerating(String(response.courseId)), {
+        state: { courseName: form.courseName },
+      })
     },
   })
   const findFamilyCandidateMutation = useMutation({
