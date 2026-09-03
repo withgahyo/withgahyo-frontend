@@ -73,7 +73,15 @@ export async function withdrawUser() {
 
 export function unwrapApiResponse<T>(response: BackendApiResponse<T>) {
   if ('result' in response) {
+    if (!response.isSuccess) {
+      throw new Error(`[${response.code}] ${response.message}`)
+    }
+
     return response.result
+  }
+
+  if (!response.success) {
+    throw new Error(`[${response.code}] ${response.message}`)
   }
 
   return response.data

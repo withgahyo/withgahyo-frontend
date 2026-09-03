@@ -29,9 +29,19 @@ export async function getFoodPreferenceOptions() {
 }
 
 export async function saveOnboarding(request: OnboardingSaveRequest) {
-  await apiClient.put<BackendApiResponse<null>>('/api/v1/users/me/onboarding', request)
+  const response = await apiClient.put<BackendApiResponse<null>>(
+    '/api/v1/users/me/onboarding',
+    request,
+  )
+
+  // HTTP 2xx 라도 envelope 가 논리적 실패(success/isSuccess === false)면 throw 한다.
+  unwrapApiResponse(response.data)
 }
 
 export async function completeOnboarding() {
-  await apiClient.post<BackendApiResponse<null>>('/api/v1/users/me/onboarding/complete')
+  const response = await apiClient.post<BackendApiResponse<null>>(
+    '/api/v1/users/me/onboarding/complete',
+  )
+
+  unwrapApiResponse(response.data)
 }
