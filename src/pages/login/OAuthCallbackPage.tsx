@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import BrandLoadingScreen from '../../components/common/BrandLoadingScreen'
 import { useSocialLoginMutation } from '../../features/auth/hooks/useAuthMutations'
 import { getOAuthRedirectUri, type OAuthProvider } from '../../features/auth/config/oauth'
 import { clearAuthTokens } from '../../features/auth/utils/tokenStorage'
@@ -42,10 +43,9 @@ function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) {
     })
       .then((result) => {
         const onboardingCompleted = result.user?.onboardingCompleted ?? false
-        navigate(
-          onboardingCompleted ? ROUTE_PATHS.home : ROUTE_PATHS.onboardingTourism,
-          { replace: true },
-        )
+        navigate(onboardingCompleted ? ROUTE_PATHS.home : ROUTE_PATHS.onboardingTourism, {
+          replace: true,
+        })
       })
       .catch(() => {
         clearAuthTokens()
@@ -73,48 +73,38 @@ function OAuthCallbackPage({ provider }: OAuthCallbackPageProps) {
     }
   }, [navigate, oauthError])
 
-  const message = getCallbackMessage({
-    hasCode: Boolean(code),
-    isError: Boolean(oauthError || status === 'error'),
-    isPending: status === 'pending',
-  })
+  const isFailure = Boolean(oauthError || status === 'error' || !code)
+
+  // 로그인 진행 중에는 코스 생성 화면과 동일한 브랜드 로딩 화면을 보여준다.
+  if (!isFailure) {
+    return (
+      <BrandLoadingScreen
+        message={status === 'pending' ? '로그인 중이에요...' : '로그인을 준비하고 있어요...'}
+        srMessage="로그인을 진행하고 있습니다"
+      />
+    )
+  }
 
   return (
     <main className="flex min-h-app flex-col items-center justify-center bg-brand-lime px-6 text-center">
-      <p className="text-lg font-semibold text-ink">{message}</p>
-      {(oauthError || status === 'error' || !code) && (
-        <Link
-          to={ROUTE_PATHS.login}
-          replace
-          className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-semibold text-ink shadow-sm"
-        >
-          로그인 화면으로 돌아가기
-        </Link>
-      )}
+      <p className="text-lg font-semibold text-ink">{getFailureMessage(Boolean(code))}</p>
+      <Link
+        to={ROUTE_PATHS.login}
+        replace
+        className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-semibold text-ink shadow-sm"
+      >
+        로그인 화면으로 돌아가기
+      </Link>
     </main>
   )
 }
 
-interface CallbackMessageState {
-  hasCode: boolean
-  isError: boolean
-  isPending: boolean
-}
-
-function getCallbackMessage({ hasCode, isError, isPending }: CallbackMessageState) {
+function getFailureMessage(hasCode: boolean) {
   if (!hasCode) {
     return '로그인 정보를 확인할 수 없어요.'
   }
 
-  if (isError) {
-    return '로그인에 실패했어요. 로그인 화면으로 돌아갑니다.'
-  }
-
-  if (isPending) {
-    return '로그인 중입니다.'
-  }
-
-  return '로그인을 준비하고 있어요.'
+  return '로그인에 실패했어요. 로그인 화면으로 돌아갑니다.'
 }
 
 export default OAuthCallbackPage
