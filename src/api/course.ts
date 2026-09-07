@@ -189,3 +189,57 @@ export async function createCourse(request: CreateCourseRequest) {
 
   return unwrapApiResponse(response.data)
 }
+
+// --- 코스 상세 조회 (GET /api/v1/courses/{courseId}) ---
+// 실제 API 응답 스펙 그대로 정의한다. 현재 상세 화면에서 사용하지 않는 필드도 포함한다.
+export interface CourseDetailParticipantResponse {
+  familyMemberId: number
+  name: string
+  relationship: string
+  profileImageUrl: string | null
+}
+
+export interface CourseDetailPlaceResponse {
+  placeId: number
+  source: string
+  externalPlaceId: string
+  name: string
+  category: string
+  address: string
+  areaCode: string
+  sigunguCode: string
+  imageUrl: string | null
+  latitude: number
+  longitude: number
+}
+
+export interface CourseDetailDayResponse {
+  day: number
+  date: string
+  places: CourseDetailPlaceResponse[]
+}
+
+export interface CourseDetailResponse {
+  courseId: number
+  title: string
+  status: string
+  startDate: string
+  endDate: string
+  daysUntilTrip: number
+  region: CourseRegionResponse
+  imageUrl: string | null
+  tags: string[]
+  liked: boolean
+  likeCount: number
+  albumId: number | null
+  participants: CourseDetailParticipantResponse[]
+  days: CourseDetailDayResponse[]
+}
+
+export async function getCourseDetail(courseId: number) {
+  const response = await apiClient.get<BackendApiResponse<CourseDetailResponse>>(
+    `/api/v1/courses/${courseId}`,
+  )
+
+  return unwrapApiResponse(response.data)
+}
