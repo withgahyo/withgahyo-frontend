@@ -191,7 +191,7 @@ export async function createCourse(request: CreateCourseRequest) {
 }
 
 // --- 코스 상세 조회 (GET /api/v1/courses/{courseId}) ---
-// 실제 API 응답 스펙 그대로 정의한다. 현재 상세 화면에서 사용하지 않는 필드도 포함한다.
+// Swagger 응답 스펙 그대로 정의한다. 현재 상세 화면에서 쓰지 않는 필드도 포함한다.
 export interface CourseDetailParticipantResponse {
   familyMemberId: number
   name: string
@@ -199,18 +199,33 @@ export interface CourseDetailParticipantResponse {
   profileImageUrl: string | null
 }
 
-export interface CourseDetailPlaceResponse {
-  placeId: number
-  source: string
-  externalPlaceId: string
-  name: string
-  category: string
-  address: string
+// 상세 응답의 region 은 검색 API(CourseRegionResponse)보다 좁다.
+export interface CourseDetailRegionResponse {
   areaCode: string
   sigunguCode: string
-  imageUrl: string | null
+  name: string
+}
+
+// 장소 → 다음 장소 이동 정보. 후보 상세 응답에서도 동일 형태로 쓰인다.
+export interface CourseTransportToNextResponse {
+  mode: string | null
+  durationMinutes: number | null
+  distanceMeters: number | null
+}
+
+export interface CourseDetailPlaceResponse {
+  scheduleItemId: number
+  order: number
+  placeId: number
+  name: string
+  category: string
+  arrivalTime: string | null
+  departureTime: string | null
   latitude: number
   longitude: number
+  // TODO(백엔드 확인): 요소 타입 미확정. 현재 화면에서는 사용하지 않는다.
+  accessibilitySummary: string[]
+  transportToNext: CourseTransportToNextResponse
 }
 
 export interface CourseDetailDayResponse {
@@ -222,11 +237,12 @@ export interface CourseDetailDayResponse {
 export interface CourseDetailResponse {
   courseId: number
   title: string
+  // candidate 선택 후 CONFIRMED 가 아니라 'UPCOMING' 이 온다.
   status: string
   startDate: string
   endDate: string
   daysUntilTrip: number
-  region: CourseRegionResponse
+  region: CourseDetailRegionResponse
   imageUrl: string | null
   tags: string[]
   liked: boolean

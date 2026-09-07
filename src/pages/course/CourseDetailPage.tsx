@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CourseDetailSheet from '../../features/course/components/CourseDetailSheet'
 import CourseMap from '../../features/course/components/CourseMap'
-import { getCourseDetailView } from '../../features/course/api/getCourseDetailView'
+import { useCourseDetail } from '../../features/course/hooks/useCourseQueries'
 import type { SheetState } from '../../features/course/types'
 
 // 바텀시트가 expanded일 때 지도의 아래쪽 약 62%를 덮으므로, 그만큼을 지도 setBounds
@@ -23,15 +22,14 @@ function CourseDetailPage() {
   const navigate = useNavigate()
   const { courseId } = useParams<{ courseId: string }>()
 
+  const numericCourseId = courseId ? Number(courseId) : null
   const {
     data: course,
     isError,
     isLoading,
-  } = useQuery({
-    queryKey: ['courses', courseId],
-    queryFn: () => getCourseDetailView(courseId as string),
-    enabled: Boolean(courseId),
-  })
+  } = useCourseDetail(
+    numericCourseId != null && Number.isFinite(numericCourseId) ? numericCourseId : null,
+  )
 
   const [sheetState, setSheetState] = useState<SheetState>('expanded')
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null)
@@ -86,7 +84,7 @@ function CourseDetailPage() {
         <ChevronLeft aria-hidden="true" size={30} />
       </button>
 
-      {!courseId || isError ? (
+      {numericCourseId == null || !Number.isFinite(numericCourseId) || isError ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="text-base font-semibold text-ink">코스를 불러올 수 없어요</p>
           <p className="text-caption text-gray-400">잠시 후 다시 시도해주세요.</p>

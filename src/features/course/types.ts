@@ -33,26 +33,32 @@ export interface CourseCreateFormState {
   familyMemberIds: number[]
 }
 
-export interface RecommendedCourse {
-  id: string
+// AI 추천 후보 목록 카드용 뷰 모델. summary 문자열(거리/일수 포함)이 표시의 source of truth.
+export interface CourseCandidateSummary {
+  candidateId: number
   title: string
-  satisfaction: number
+  summary: string
+  matchScore: number
   tags: string[]
-  totalDistanceKm: number
-  totalDurationMinutes: number
-  imageUrl?: string
+  thumbnailImageUrl: string | null
 }
 
 // --- 코스 상세 화면 뷰 모델 ---
-// API 응답(CourseDetailResponse)을 features/course/mappers/toCourseDetail 로 이 형태로
+// API 응답(CourseDetailResponse / CourseCandidateDetailResponse)을 mappers 로 이 형태로
 // 변환해 컴포넌트에서 사용한다.
-export type PlaceCategory = 'BAKERY' | 'RESTAURANT' | 'NATURE' | 'CAFE' | 'ATTRACTION' | 'ETC'
+// category 는 백엔드 enum이 완전히 확정되지 않아 string 으로 둔다.
+// 확인된 값: FOOD / RESTAURANT / CAFE / BAKERY / TOUR / CULTURE / WALK / NATURE / ATTRACTION.
+// PlaceCategoryIcon 이 알 수 없는 값은 기본 아이콘으로 처리한다.
+export type PlaceCategory = string
 
 export type TravelMode = 'CAR' | 'WALK'
 
 export interface CoursePlace {
   id: number
+  /** days 를 펼친 전역 순번(1-base). 지도 폴리라인/목록 정렬 기준. */
   order: number
+  /** 소속 일자(1-base). Day 구분 헤더용. days[].day 를 그대로 보존한다. */
+  day?: number
   name: string
   category: PlaceCategory
   latitude: number
@@ -70,6 +76,19 @@ export interface CoursePlace {
 export interface CourseDetail {
   id: string
   title: string
+  places: CoursePlace[]
+}
+
+// AI 추천 후보 상세 뷰 모델. 지도/시트는 CourseDetail 과 동일하게 places 를 쓴다.
+export interface CourseCandidateDetailView {
+  candidateId: number
+  generationId: number
+  title: string
+  summary: string
+  matchScore: number
+  tags: string[]
+  recommendationReasons: string[]
+  accessibilityHighlights: string[]
   places: CoursePlace[]
 }
 
