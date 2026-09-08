@@ -22,6 +22,7 @@ import MyPage from '../pages/mypage/MyPage'
 import CourseCreatePage from '../pages/course/CourseCreatePage'
 import CourseGeneratingPage from '../pages/course/CourseGeneratingPage'
 import CourseRecommendationsPage from '../pages/course/CourseRecommendationsPage'
+import CourseCandidateDetailPage from '../pages/course/CourseCandidateDetailPage'
 import CourseDetailPage from '../pages/course/CourseDetailPage'
 
 import NotificationPage from '../pages/notification/NotificationPage'
@@ -93,12 +94,16 @@ export const router = createBrowserRouter([
               },
 
               {
-                path: '/courses/generating/:generationId',
+                path: '/courses/:courseId/generating/:generationId',
                 element: <CourseGeneratingPage />,
               },
               {
-                path: '/courses/recommendations/:generationId',
+                path: '/courses/:courseId/recommendations/:generationId',
                 element: <CourseRecommendationsPage />,
+              },
+              {
+                path: '/courses/:courseId/recommendations/:generationId/candidates/:candidateId',
+                element: <CourseCandidateDetailPage />,
               },
               { path: '/courses/:courseId', element: <CourseDetailPage /> },
 

@@ -1,11 +1,12 @@
 import { ChevronLeft, Pencil, RefreshCw } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import vectorDecoration from '../../assets/splash/Vector.svg'
 import RecommendedCourseCard from '../../features/course/components/RecommendedCourseCard'
 import {
-  MOCK_COURSE_NAME_FALLBACK,
-  MOCK_RECOMMENDED_COURSES,
-} from '../../features/course/mocks/recommendedCourses'
+  useCourseCandidates,
+  useSelectCourseCandidate,
+} from '../../features/course/hooks/useCourseQueries'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 
 interface RecommendationLocationState {
   courseName?: string
@@ -14,12 +15,30 @@ interface RecommendationLocationState {
 function CourseRecommendationsPage() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { courseId, generationId } = useParams<{ courseId: string; generationId: string }>()
   const state = location.state as RecommendationLocationState | null
-  const courseName = state?.courseName?.trim() || MOCK_COURSE_NAME_FALLBACK
+  const courseName = state?.courseName?.trim() || '추천 코스'
+
+  const numericGenerationId = generationId ? Number(generationId) : null
+  const hasValidParams =
+    Boolean(courseId) && numericGenerationId != null && Number.isFinite(numericGenerationId)
+
+  const candidatesQuery = useCourseCandidates(hasValidParams ? numericGenerationId : null)
+  const selectMutation = useSelectCourseCandidate(hasValidParams ? numericGenerationId : null)
+
+  const candidates = candidatesQuery.data?.candidates ?? []
+
+  const handleSelect = (candidateId: number) => {
+    if (selectMutation.isPending) return
+    selectMutation.mutate(candidateId, {
+      onSuccess: (data) => {
+        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
+      },
+    })
+  }
 
   return (
     // CourseCreatePage와 동일하게 Hero는 고정, 흰 Sheet 내부에서만 스크롤한다.
-    // AppContainer의 Safe Area padding을 -mt/-mb로 상쇄하고 Hero/Sheet가 각각 직접 소유한다.
     <div className="relative -mt-[env(safe-area-inset-top)] -mb-[env(safe-area-inset-bottom)] flex h-app flex-col overflow-hidden">
       <div className="relative shrink-0 overflow-hidden bg-brand-blue">
         <img
@@ -66,9 +85,80 @@ function CourseRecommendationsPage() {
             </button>
           </div>
 
-          {MOCK_RECOMMENDED_COURSES.map((course) => (
-            <RecommendedCourseCard key={course.id} course={course} />
-          ))}
+          {!hasValidParams || candidatesQuery.isError ? (
+            <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+              <p className="text-base font-semibold text-ink">추천 결과를 불러올 수 없어요</p>
+              <p className="text-caption text-gray-400">잠시 후 다시 시도해주세요.</p>
+              <div className="mt-1 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTE_PATHS.courseCreate, { replace: true })}
+                  className="rounded-full border border-gray-300 px-5 py-2.5 text-sm font-semibold text-ink"
+                >
+                  코스 다시 만들기
+                </button>
+                {hasValidParams && (
+                  <button
+                    type="button"
+                    onClick={() => candidatesQuery.refetch()}
+                    className="rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white"
+                  >
+                    다시 시도
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : candidatesQuery.isLoading ? (
+            <p className="py-10 text-center text-caption text-gray-400">
+              추천 코스를 불러오는 중...
+            </p>
+          ) : candidates.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+              <p className="text-base font-semibold text-ink">
+                추천 가능한 코스를 찾지 못했어요
+              </p>
+              <p className="text-caption text-gray-400">
+                여행 조건을 조금 바꿔서 다시 시도해보세요.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTE_PATHS.courseCreate, { replace: true })}
+                className="mt-1 rounded-full bg-brand-blue px-5 py-2.5 text-sm font-semibold text-white"
+              >
+                코스 정보 다시 입력하기
+              </button>
+            </div>
+          ) : (
+            <>
+              {selectMutation.isError && (
+                <p className="text-center text-sm text-red-500">
+                  코스 확정에 실패했습니다. 다시 시도해주세요.
+                </p>
+              )}
+
+              {candidates.map((candidate) => (
+                <RecommendedCourseCard
+                  key={candidate.candidateId}
+                  candidate={{
+                    candidateId: candidate.candidateId,
+                    title: candidate.title,
+                    summary: candidate.summary,
+                    matchScore: candidate.matchScore,
+                    tags: candidate.tags ?? [],
+                    thumbnailImageUrl: candidate.thumbnailImageUrl,
+                  }}
+                  courseId={courseId ?? ''}
+                  generationId={generationId ?? ''}
+                  onSelect={handleSelect}
+                  isSelecting={
+                    selectMutation.isPending &&
+                    selectMutation.variables === candidate.candidateId
+                  }
+                  disabled={selectMutation.isPending}
+                />
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>

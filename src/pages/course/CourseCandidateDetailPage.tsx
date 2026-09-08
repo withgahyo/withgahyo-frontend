@@ -3,11 +3,14 @@ import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CourseDetailSheet from '../../features/course/components/CourseDetailSheet'
 import CourseMap from '../../features/course/components/CourseMap'
-import { useCourseDetail } from '../../features/course/hooks/useCourseQueries'
+import {
+  useCourseCandidateDetail,
+  useSelectCourseCandidate,
+} from '../../features/course/hooks/useCourseQueries'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 import type { SheetState } from '../../features/course/types'
 
-// 바텀시트가 expanded일 때 지도의 아래쪽 약 62%를 덮으므로, 그만큼을 지도 setBounds
-// 하단 패딩으로 넘겨 모든 마커가 시트 위 영역에 보이도록 한다.
+// CourseDetailPage 와 동일: 시트가 expanded일 때 지도 하단이 가려지는 비율.
 const SHEET_RATIO = 0.62
 
 function prefersReducedMotion() {
@@ -18,37 +21,42 @@ function prefersReducedMotion() {
   )
 }
 
-function CourseDetailPage() {
+function CourseCandidateDetailPage() {
   const navigate = useNavigate()
-  const { courseId } = useParams<{ courseId: string }>()
+  // courseId 는 경로에만 존재한다. 최종 이동 대상 courseId 는 selection 응답에서 받는다.
+  const { generationId, candidateId } = useParams<{
+    generationId: string
+    candidateId: string
+  }>()
 
-  const numericCourseId = courseId ? Number(courseId) : null
+  const numericGenerationId = generationId ? Number(generationId) : null
+  const numericCandidateId = candidateId ? Number(candidateId) : null
+  const hasValidParams =
+    numericGenerationId != null &&
+    Number.isFinite(numericGenerationId) &&
+    numericCandidateId != null &&
+    Number.isFinite(numericCandidateId)
+
   const {
-    data: course,
+    data: candidate,
     isError,
     isLoading,
-  } = useCourseDetail(
-    numericCourseId != null && Number.isFinite(numericCourseId) ? numericCourseId : null,
+  } = useCourseCandidateDetail(
+    hasValidParams ? numericGenerationId : null,
+    hasValidParams ? numericCandidateId : null,
   )
+  const selectMutation = useSelectCourseCandidate(hasValidParams ? numericGenerationId : null)
 
   const [sheetState, setSheetState] = useState<SheetState>('expanded')
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null)
-  // 값이 바뀔 때 CourseMap이 카메라 동작을 실행한다. 시트 transition 종료 시점에 올린다.
   const [cameraTick, setCameraTick] = useState(0)
 
   const bumpCamera = () => setCameraTick((tick) => tick + 1)
-
   const handleBack = () => navigate(-1)
-
-  // TODO: 코스 찜하기 API 연동
-  const handleWishlist = () => {}
-  // TODO: 코스 확정 API 연동
-  const handleConfirm = () => {}
 
   const changeSheetState = (next: SheetState) => {
     if (sheetState === next) return
     setSheetState(next)
-    // 애니메이션이 없으면 transitionend가 오지 않으므로 즉시 카메라를 갱신한다.
     if (prefersReducedMotion()) bumpCamera()
   }
 
@@ -59,15 +67,24 @@ function CourseDetailPage() {
   const handlePlaceSelect = (id: number) => {
     setSelectedPlaceId(id)
     if (sheetState === 'expanded') {
-      changeSheetState('collapsed') // transition 종료 후 카메라가 해당 장소로 이동
+      changeSheetState('collapsed')
     } else {
-      bumpCamera() // 이미 collapsed → 바로 이동
+      bumpCamera()
     }
   }
 
   const handleShowFullCourse = () => {
     setSelectedPlaceId(null)
-    bumpCamera() // 시트는 collapsed 유지, 전체 bounds로 복귀
+    bumpCamera()
+  }
+
+  const handleConfirm = () => {
+    if (!hasValidParams || selectMutation.isPending) return
+    selectMutation.mutate(numericCandidateId as number, {
+      onSuccess: (data) => {
+        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
+      },
+    })
   }
 
   const mapBottomPadding =
@@ -84,9 +101,9 @@ function CourseDetailPage() {
         <ChevronLeft aria-hidden="true" size={30} />
       </button>
 
-      {numericCourseId == null || !Number.isFinite(numericCourseId) || isError ? (
+      {!hasValidParams || isError ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
-          <p className="text-base font-semibold text-ink">코스를 불러올 수 없어요</p>
+          <p className="text-base font-semibold text-ink">추천 코스를 불러올 수 없어요</p>
           <p className="text-caption text-gray-400">잠시 후 다시 시도해주세요.</p>
           <button
             type="button"
@@ -96,15 +113,15 @@ function CourseDetailPage() {
             돌아가기
           </button>
         </div>
-      ) : isLoading || !course ? (
+      ) : isLoading || !candidate ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-caption text-gray-400">코스를 불러오는 중...</p>
+          <p className="text-caption text-gray-400">추천 코스를 불러오는 중...</p>
         </div>
       ) : (
         <>
           <div className="absolute inset-0">
             <CourseMap
-              places={course.places}
+              places={candidate.places}
               selectedPlaceId={selectedPlaceId}
               sheetState={sheetState}
               bottomPadding={mapBottomPadding}
@@ -113,21 +130,29 @@ function CourseDetailPage() {
             />
           </div>
           <CourseDetailSheet
-            places={course.places}
-            courseTitle={course.title}
+            places={candidate.places}
+            courseTitle={candidate.title}
             sheetState={sheetState}
             selectedPlaceId={selectedPlaceId}
             onToggleSheet={handleToggleSheet}
             onSheetStateChange={changeSheetState}
             onPlaceSelect={handlePlaceSelect}
             onSheetTransitionEnd={bumpCamera}
-            onWishlist={handleWishlist}
+            onWishlist={() => {}}
             onConfirm={handleConfirm}
+            confirmLabel={selectMutation.isPending ? '확정 중...' : '이 코스로 확정'}
+            isConfirmPending={selectMutation.isPending}
+            hideWishlist
           />
+          {selectMutation.isError && (
+            <p className="absolute inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-20 text-center text-sm font-medium text-red-500">
+              코스 확정에 실패했습니다. 다시 시도해주세요.
+            </p>
+          )}
         </>
       )}
     </div>
   )
 }
 
-export default CourseDetailPage
+export default CourseCandidateDetailPage

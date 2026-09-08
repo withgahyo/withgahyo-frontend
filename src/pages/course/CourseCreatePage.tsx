@@ -10,6 +10,8 @@ import {
   searchPlaces,
   searchRegions,
 } from '../../api/course'
+import type { CreateCourseRequest } from '../../api/course'
+import { createCourseGeneration } from '../../api/courseGeneration'
 import PrimaryButton from '../../components/common/PrimaryButton'
 import CourseCreateHeader from '../../features/course/components/CourseCreateHeader'
 import CourseNameField from '../../features/course/components/CourseNameField'
@@ -82,12 +84,19 @@ function CourseCreatePage() {
       }),
     enabled: Boolean(form.region && placeQueryText),
   })
-  const createCourseMutation = useMutation({
-    mutationFn: createCourse,
-    onSuccess: (response) => {
-      navigate(ROUTE_PATHS.courseGenerating(String(response.courseId)), {
-        state: { courseName: form.courseName },
-      })
+  // 코스 초안 생성(POST /courses) → 바로 AI Generation 생성(POST /courses/{id}/generations)까지
+  // 한 mutation 으로 이어서 호출한다. 둘 중 하나라도 실패하면 mutation 전체가 실패 처리된다.
+  const generateCourseMutation = useMutation({
+    mutationFn: async (request: CreateCourseRequest) => {
+      const course = await createCourse(request)
+      const generation = await createCourseGeneration(course.courseId)
+      return { courseId: course.courseId, generationId: generation.generationId }
+    },
+    onSuccess: ({ courseId, generationId }) => {
+      navigate(
+        ROUTE_PATHS.courseGenerating(String(courseId), String(generationId)),
+        { state: { courseName: form.courseName }, replace: true },
+      )
     },
   })
   const findFamilyCandidateMutation = useMutation({
@@ -182,7 +191,7 @@ function CourseCreatePage() {
   const handleGenerate = () => {
     if (!isFormValid || !form.region || !form.startDate || !form.endDate) return
 
-    createCourseMutation.mutate({
+    generateCourseMutation.mutate({
       title: form.courseName,
       areaCode: form.region.areaCode,
       sigunguCode: form.region.sigunguCode,
@@ -283,16 +292,18 @@ function CourseCreatePage() {
             onAddClick={() => setIsFamilySheetOpen(true)}
           />
 
-          {createCourseMutation.isError && (
-            <p className="text-center text-sm text-red-500">코스 생성에 실패했습니다.</p>
+          {generateCourseMutation.isError && (
+            <p className="text-center text-sm text-red-500">
+              코스 생성에 실패했습니다. 잠시 후 다시 시도해주세요.
+            </p>
           )}
 
           <PrimaryButton
             variant="lime"
-            disabled={!isFormValid || createCourseMutation.isPending}
+            disabled={!isFormValid || generateCourseMutation.isPending}
             onClick={handleGenerate}
           >
-            {createCourseMutation.isPending ? '생성 중...' : 'AI 코스 생성하기'}
+            {generateCourseMutation.isPending ? '생성 중...' : 'AI 코스 생성하기'}
           </PrimaryButton>
         </div>
       </div>

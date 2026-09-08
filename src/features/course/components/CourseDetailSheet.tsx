@@ -1,5 +1,5 @@
 import type { PointerEvent, TransitionEvent } from 'react'
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import { Heart } from 'lucide-react'
 import CoursePlaceItem from './CoursePlaceItem'
 import { SHEET_SWIPE_THRESHOLD } from '../constants'
@@ -16,6 +16,12 @@ interface CourseDetailSheetProps {
   onSheetTransitionEnd: () => void
   onWishlist: () => void
   onConfirm: () => void
+  /** 확정 버튼 라벨. 기본값 '코스 확정하기' (후보 상세에서는 '이 코스로 확정' 등으로 덮어쓴다) */
+  confirmLabel?: string
+  /** 확정 요청 중이면 버튼을 잠근다 */
+  isConfirmPending?: boolean
+  /** 찜하기 버튼 숨김 (후보 상세 등 찜 개념이 없는 화면) */
+  hideWishlist?: boolean
 }
 
 function CourseDetailSheet({
@@ -29,6 +35,9 @@ function CourseDetailSheet({
   onSheetTransitionEnd,
   onWishlist,
   onConfirm,
+  confirmLabel = '코스 확정하기',
+  isConfirmPending = false,
+  hideWishlist = false,
 }: CourseDetailSheetProps) {
   const sortedPlaces = [...places].sort((a, b) => a.order - b.order)
   const selectedPlace = sortedPlaces.find((place) => place.id === selectedPlaceId) ?? null
@@ -113,34 +122,58 @@ function CourseDetailSheet({
 
       {/* 장소 목록 — 이 영역만 세로 스크롤된다. collapsed에서는 숨긴다 */}
       <ol className="min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-4 group-data-[state=collapsed]/sheet:hidden">
-        {sortedPlaces.map((place, index) => (
-          <CoursePlaceItem
-            key={place.id}
-            place={place}
-            isFirst={index === 0}
-            isLast={index === sortedPlaces.length - 1}
-            isSelected={place.id === selectedPlaceId}
-            onSelect={onPlaceSelect}
-          />
-        ))}
+        {sortedPlaces.map((place, index) => {
+          const previousDay = index > 0 ? sortedPlaces[index - 1].day : undefined
+          const nextDay =
+            index < sortedPlaces.length - 1 ? sortedPlaces[index + 1].day : undefined
+          // day 값은 최종 상세/후보 상세 응답에만 있다. 없으면 헤더 없이 평면 리스트로 렌더한다.
+          const showDayHeader = place.day != null && place.day !== previousDay
+          const isDayStart = index === 0 || showDayHeader
+          const isDayEnd = index === sortedPlaces.length - 1 || (place.day != null && place.day !== nextDay)
+
+          return (
+            <Fragment key={place.id}>
+              {showDayHeader && (
+                <li className="pt-3 pb-1 first:pt-0">
+                  <span className="text-caption font-bold text-brand-blue">Day {place.day}</span>
+                </li>
+              )}
+              <CoursePlaceItem
+                place={place}
+                isFirst={isDayStart}
+                isLast={isDayEnd}
+                isSelected={place.id === selectedPlaceId}
+                onSelect={onPlaceSelect}
+              />
+            </Fragment>
+          )
+        })}
       </ol>
 
       {/* CTA — expanded에서만 노출, 목록을 스크롤해도 하단 고정 */}
       <div className="flex shrink-0 gap-2 border-t border-gray-100 px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] group-data-[state=collapsed]/sheet:hidden">
-        <button
-          type="button"
-          onClick={onWishlist}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-lime py-3.5 text-sm font-semibold text-brand-blue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
-        >
-          <Heart aria-hidden="true" size={16} strokeWidth={2.5} />
-          코스 찜하기
-        </button>
+        {!hideWishlist && (
+          <button
+            type="button"
+            onClick={onWishlist}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-lime py-3.5 text-sm font-semibold text-brand-blue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+          >
+            <Heart aria-hidden="true" size={16} strokeWidth={2.5} />
+            코스 찜하기
+          </button>
+        )}
         <button
           type="button"
           onClick={onConfirm}
-          className="flex-1 rounded-full bg-brand-blue py-3.5 text-sm font-semibold text-brand-lime transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+          disabled={isConfirmPending}
+          aria-disabled={isConfirmPending}
+          className={`flex-1 rounded-full py-3.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
+            isConfirmPending
+              ? 'cursor-not-allowed bg-gray-200 text-gray-400'
+              : 'bg-brand-blue text-brand-lime'
+          }`}
         >
-          코스 확정하기
+          {confirmLabel}
         </button>
       </div>
     </section>
