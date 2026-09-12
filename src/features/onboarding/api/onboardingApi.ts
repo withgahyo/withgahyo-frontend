@@ -1,7 +1,7 @@
 import { unwrapApiResponse } from '../../../api/auth'
 import { apiClient } from '../../../api/client'
 import type { ApiResponse } from '../../../types/api'
-import type { OnboardingSaveRequest, PreferenceOption } from './types'
+import type { OnboardingResponse, OnboardingSaveRequest, PreferenceOption } from './types'
 
 type BackendApiResponse<T> =
   | ApiResponse<T>
@@ -23,6 +23,14 @@ export async function getTourismPreferenceOptions() {
 export async function getFoodPreferenceOptions() {
   const response = await apiClient.get<BackendApiResponse<PreferenceOption[]>>(
     '/api/v1/onboarding/food-preferences',
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function getOnboarding() {
+  const response = await apiClient.get<BackendApiResponse<OnboardingResponse>>(
+    '/api/v1/users/me/onboarding',
   )
 
   return unwrapApiResponse(response.data)

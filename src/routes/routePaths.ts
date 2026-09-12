@@ -13,6 +13,10 @@ export const ROUTE_PATHS = {
   popular: '/popular',
   albums: '/albums',
   mypage: '/mypage',
+  mypageProfile: '/mypage/profile',
+  mypagePreferences: '/mypage/preferences',
+  support: '/support',
+  terms: '/terms',
 
   courseCreate: '/courses/create',
 

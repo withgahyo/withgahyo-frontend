@@ -8,7 +8,7 @@ interface FamilyManagementSectionProps {
   errorMessage?: string
   removingId?: number | null
   onAddClick: () => void
-  onRemove: (familyMemberId: number) => void
+  onRemove: (familyMember: CourseFamilyMemberResponse) => void
 }
 
 function FamilyManagementSection({
@@ -54,7 +54,7 @@ function FamilyManagementSection({
                     <button
                       type="button"
                       disabled={removingId === member.familyMemberId}
-                      onClick={() => onRemove(member.familyMemberId)}
+                      onClick={() => onRemove(member)}
                       className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-ink/45 shadow-sm ring-1 ring-ink/10 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
                       aria-label={`${member.nickname} 가족 연결 해제`}
                     >
@@ -63,6 +63,9 @@ function FamilyManagementSection({
                   </span>
                   <span className="max-w-full truncate text-xs font-semibold text-ink">
                     {member.nickname}
+                  </span>
+                  <span className="-mt-1 max-w-full truncate text-[11px] font-medium text-ink/45">
+                    {member.relationship}
                   </span>
                 </div>
               ))}
