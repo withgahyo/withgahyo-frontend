@@ -5,6 +5,7 @@ export const queryKeys = {
 
   notifications: ['notifications'] as const,
 
+  onboarding: ['onboarding'] as const,
   onboardingTourismOptions: ['onboarding', 'tourism-options'] as const,
   onboardingFoodOptions: ['onboarding', 'food-options'] as const,
 
