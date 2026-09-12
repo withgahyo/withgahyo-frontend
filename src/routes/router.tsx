@@ -18,6 +18,10 @@ import PopularPage from '../pages/popular/PopularPage'
 import AlbumsPage from '../pages/albums/AlbumsPage'
 import AlbumDetailPage from '../pages/albums/AlbumDetailPage'
 import MyPage from '../pages/mypage/MyPage'
+import ProfileEditPage from '../pages/mypage/ProfileEditPage'
+import SupportChatPage from '../pages/mypage/SupportChatPage'
+import TermsPage from '../pages/mypage/TermsPage'
+import TravelPreferenceEditPage from '../pages/mypage/TravelPreferenceEditPage'
 
 import CourseCreatePage from '../pages/course/CourseCreatePage'
 import CourseGeneratingPage from '../pages/course/CourseGeneratingPage'
@@ -109,6 +113,10 @@ export const router = createBrowserRouter([
 
               { path: '/albums/:albumId', element: <AlbumDetailPage /> },
               { path: ROUTE_PATHS.notifications, element: <NotificationPage /> },
+              { path: ROUTE_PATHS.mypageProfile, element: <ProfileEditPage /> },
+              { path: ROUTE_PATHS.mypagePreferences, element: <TravelPreferenceEditPage /> },
+              { path: ROUTE_PATHS.support, element: <SupportChatPage /> },
+              { path: ROUTE_PATHS.terms, element: <TermsPage /> },
               { path: '/reviews/:courseId', element: <ReviewPage /> },
             ],
           },
