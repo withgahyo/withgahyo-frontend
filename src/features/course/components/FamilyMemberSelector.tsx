@@ -40,11 +40,25 @@ function FamilyMemberSelector({
                 className="flex shrink-0 flex-col items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
               >
                 <span className="relative">
-                  <span
-                    className={`flex h-14 w-14 items-center justify-center rounded-full ${
-                      isSelected ? 'bg-brand-lime' : 'bg-gray-200'
-                    }`}
-                  />
+                  {member.profileImageUrl ? (
+                    <img
+                      src={member.profileImageUrl}
+                      alt=""
+                      className={`h-14 w-14 rounded-full object-cover ring-2 ${
+                        isSelected ? 'ring-brand-lime' : 'ring-transparent'
+                      }`}
+                    />
+                  ) : (
+                    <span
+                      className={`flex h-14 w-14 items-center justify-center rounded-full text-sm font-extrabold ${
+                        isSelected
+                          ? 'bg-brand-lime text-brand-blue'
+                          : 'bg-gray-200 text-ink/50'
+                      }`}
+                    >
+                      {member.name.slice(0, 1)}
+                    </span>
+                  )}
                   {isSelected && (
                     <span
                       aria-hidden="true"
