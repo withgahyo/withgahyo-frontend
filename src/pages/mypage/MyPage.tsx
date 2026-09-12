@@ -12,6 +12,7 @@ import { ROUTE_PATHS } from '../../routes/routePaths'
 import { queryKeys } from '../../constants/queryKeys'
 import {
   connectFamilyMember,
+  type CourseFamilyMemberResponse,
   disconnectFamilyMember,
   findFamilyMemberCandidate,
   getCourseFamilyMembers,
@@ -28,6 +29,7 @@ function MyPage() {
   const [isFamilySheetOpen, setIsFamilySheetOpen] = useState(false)
   const [familyEmail, setFamilyEmail] = useState('')
   const [familyRelationship, setFamilyRelationship] = useState('부모')
+  const [disconnectTarget, setDisconnectTarget] = useState<CourseFamilyMemberResponse | null>(null)
 
   const familyMembersQuery = useQuery({
     queryKey: queryKeys.courseFamilyMembers,
@@ -47,9 +49,7 @@ function MyPage() {
     mutationFn: disconnectFamilyMember,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.courseFamilyMembers })
-    },
-    onError: () => {
-      window.alert('가족 연결 해제에 실패했어요. 잠시 후 다시 시도해 주세요.')
+      setDisconnectTarget(null)
     },
   })
 
@@ -74,6 +74,50 @@ function MyPage() {
         }
       }),
     [isAuthActionPending, logoutMutation, navigate],
+  )
+  const myInfoMenuItems = useMemo(
+    () =>
+      MY_INFO_MENU_ITEMS.map((item) => {
+        if (item.label === '나의 여행 취향 관리') {
+          return {
+            ...item,
+            onClick: () => navigate(ROUTE_PATHS.mypagePreferences),
+          }
+        }
+        if (item.label === '개인정보 관리') {
+          return {
+            ...item,
+            onClick: () => navigate(ROUTE_PATHS.mypageProfile),
+          }
+        }
+        return item
+      }),
+    [navigate],
+  )
+  const resolvedSettingMenuItems = useMemo(
+    () =>
+      settingMenuItems.map((item) => {
+        if (item.label === '알림 설정') {
+          return {
+            ...item,
+            onClick: () => navigate(ROUTE_PATHS.notifications),
+          }
+        }
+        if (item.label === '고객센터') {
+          return {
+            ...item,
+            onClick: () => navigate(ROUTE_PATHS.support),
+          }
+        }
+        if (item.label === '이용약관') {
+          return {
+            ...item,
+            onClick: () => navigate(ROUTE_PATHS.terms),
+          }
+        }
+        return item
+      }),
+    [navigate, settingMenuItems],
   )
   const closeFamilySheet = () => {
     setIsFamilySheetOpen(false)
@@ -124,7 +168,7 @@ function MyPage() {
 
       <div className="relative -mt-6 flex-1 rounded-t-card bg-surface-muted px-6 pb-[calc(4.5rem+2.5rem+env(safe-area-inset-bottom))] pt-7">
         <div className="space-y-8">
-          <MenuSection title="내 정보" items={MY_INFO_MENU_ITEMS} />
+          <MenuSection title="내 정보" items={myInfoMenuItems} />
           <FamilyManagementSection
             familyMembers={familyMembersQuery.data?.familyMembers ?? []}
             isLoading={familyMembersQuery.isLoading}
@@ -137,12 +181,12 @@ function MyPage() {
                 : null
             }
             onAddClick={() => setIsFamilySheetOpen(true)}
-            onRemove={(familyMemberId) => {
-              if (!window.confirm('가족 연결을 해제할까요?')) return
-              disconnectFamilyMemberMutation.mutate(familyMemberId)
+            onRemove={(familyMember) => {
+              disconnectFamilyMemberMutation.reset()
+              setDisconnectTarget(familyMember)
             }}
           />
-          <MenuSection title="설정" items={settingMenuItems} />
+          <MenuSection title="설정" items={resolvedSettingMenuItems} />
           <WithdrawButton onClick={handleWithdraw} disabled={isAuthActionPending} />
         </div>
       </div>
@@ -166,6 +210,75 @@ function MyPage() {
         onConnect={handleConnectFamilyMember}
         onClose={closeFamilySheet}
       />
+      {disconnectTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
+          <button
+            type="button"
+            aria-label="가족 연결 해제 취소"
+            className="absolute inset-0 cursor-default bg-black/40"
+            onClick={() => {
+              if (!disconnectFamilyMemberMutation.isPending) {
+                setDisconnectTarget(null)
+              }
+            }}
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="disconnect-family-title"
+            className="relative w-full max-w-sm rounded-card bg-white p-5 shadow-xl"
+          >
+            <h2 id="disconnect-family-title" className="text-lg font-extrabold text-ink">
+              가족 연결을 해제할까요?
+            </h2>
+            <p className="mt-3 text-sm font-medium leading-6 text-ink/55">
+              {disconnectTarget.nickname}님과의 연결이 해제됩니다.
+            </p>
+            <div className="mt-5 flex flex-col items-center rounded-2xl bg-surface-muted px-4 py-5 text-center">
+              {disconnectTarget.profileImageUrl ? (
+                <img
+                  src={disconnectTarget.profileImageUrl}
+                  alt=""
+                  className="h-14 w-14 rounded-full object-cover"
+                />
+              ) : (
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 text-sm font-extrabold text-ink/50">
+                  {disconnectTarget.nickname.slice(0, 1)}
+                </span>
+              )}
+              <p className="mt-2 max-w-full truncate text-sm font-bold text-ink">
+                {disconnectTarget.nickname}
+              </p>
+              <p className="mt-0.5 max-w-full truncate text-xs font-semibold text-ink/45">
+                {disconnectTarget.relationship}
+              </p>
+            </div>
+            {disconnectFamilyMemberMutation.isError && (
+              <p className="mt-3 text-sm font-semibold text-red-500">
+                가족 연결 해제에 실패했어요. 잠시 후 다시 시도해 주세요.
+              </p>
+            )}
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={disconnectFamilyMemberMutation.isPending}
+                onClick={() => setDisconnectTarget(null)}
+                className="h-12 rounded-2xl bg-gray-100 text-sm font-bold text-ink/60 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                disabled={disconnectFamilyMemberMutation.isPending}
+                onClick={() => disconnectFamilyMemberMutation.mutate(disconnectTarget.familyMemberId)}
+                className="h-12 rounded-2xl bg-brand-blue text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {disconnectFamilyMemberMutation.isPending ? '해제 중...' : '해제하기'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }

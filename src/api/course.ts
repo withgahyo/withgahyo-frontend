@@ -1,4 +1,5 @@
 import { unwrapApiResponse } from './auth'
+import { resolveApiAssetUrl } from './assetUrl'
 import { apiClient } from './client'
 import type { ApiResponse } from '../types/api'
 
@@ -150,7 +151,12 @@ export async function getCourseFamilyMembers() {
     '/api/v1/family/members',
   )
 
-  return unwrapApiResponse(response.data)
+  const familyMembersResponse = unwrapApiResponse(response.data)
+
+  return {
+    ...familyMembersResponse,
+    familyMembers: familyMembersResponse.familyMembers.map(normalizeFamilyMember),
+  }
 }
 
 export async function findFamilyMemberCandidate(email: string) {
@@ -161,7 +167,7 @@ export async function findFamilyMemberCandidate(email: string) {
     },
   )
 
-  return unwrapApiResponse(response.data)
+  return normalizeFamilyMemberCandidate(unwrapApiResponse(response.data))
 }
 
 export async function connectFamilyMember(request: ConnectFamilyMemberRequest) {
@@ -170,7 +176,7 @@ export async function connectFamilyMember(request: ConnectFamilyMemberRequest) {
     request,
   )
 
-  return unwrapApiResponse(response.data)
+  return normalizeFamilyMember(unwrapApiResponse(response.data))
 }
 
 export async function disconnectFamilyMember(familyMemberId: number) {
@@ -179,6 +185,38 @@ export async function disconnectFamilyMember(familyMemberId: number) {
   )
 
   return unwrapApiResponse(response.data)
+}
+
+function normalizeFamilyMember<T extends CourseFamilyMemberResponse | ConnectFamilyMemberResponse>(
+  member: T,
+): T {
+  return {
+    ...member,
+    profileImageUrl: member.profileImageUrl ? resolveApiAssetUrl(member.profileImageUrl) : null,
+  }
+}
+
+function normalizeFamilyMemberCandidate(
+  candidate: FamilyMemberCandidateResponse,
+): FamilyMemberCandidateResponse {
+  return {
+    ...candidate,
+    profileImageUrl: candidate.profileImageUrl
+      ? resolveApiAssetUrl(candidate.profileImageUrl)
+      : null,
+  }
+}
+
+function normalizeCourseDetail(course: CourseDetailResponse): CourseDetailResponse {
+  return {
+    ...course,
+    participants: course.participants.map((participant) => ({
+      ...participant,
+      profileImageUrl: participant.profileImageUrl
+        ? resolveApiAssetUrl(participant.profileImageUrl)
+        : null,
+    })),
+  }
 }
 
 export async function createCourse(request: CreateCourseRequest) {
@@ -257,5 +295,5 @@ export async function getCourseDetail(courseId: number) {
     `/api/v1/courses/${courseId}`,
   )
 
-  return unwrapApiResponse(response.data)
+  return normalizeCourseDetail(unwrapApiResponse(response.data))
 }
