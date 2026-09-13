@@ -11,7 +11,10 @@ import {
 import {
   useCommunityComments,
   useCommunityPostDetail,
+  useCommunityPostShareUrl,
   useCreateCommunityComment,
+  useBlockCommunityUser,
+  useReportCommunityPost,
 } from '../../features/community/hooks/useCommunityQueries'
 import type {
   CommunityCommentResponse,
@@ -25,7 +28,12 @@ function CommunityDetailPage() {
   const detailQuery = useCommunityPostDetail(safePostId)
   const commentsQuery = useCommunityComments(safePostId)
   const createComment = useCreateCommunityComment(safePostId)
+  const reportPost = useReportCommunityPost(safePostId)
+  const blockUser = useBlockCommunityUser()
+  const shareUrl = useCommunityPostShareUrl(safePostId)
   const [comment, setComment] = useState('')
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
 
   const post = detailQuery.data ?? MOCK_COMMUNITY_DETAIL
   const comments = commentsQuery.data?.comments.length
@@ -45,6 +53,30 @@ function CommunityDetailPage() {
     setComment('')
   }
 
+  async function handleReport() {
+    if (safePostId == null) return
+    await reportPost.mutateAsync({
+      reason: 'INAPPROPRIATE',
+      description: '사용자가 커뮤니티 상세 화면에서 신고했습니다.',
+    })
+    setActionMessage('게시글을 신고했어요.')
+    setIsActionMenuOpen(false)
+  }
+
+  async function handleBlock() {
+    await blockUser.mutateAsync(post.authorId)
+    setActionMessage('작성자를 차단했어요.')
+    setIsActionMenuOpen(false)
+  }
+
+  async function handleShare() {
+    if (safePostId == null) return
+    const response = await shareUrl.mutateAsync()
+    await copyToClipboard(response.shareUrl)
+    setActionMessage('URL을 복사했어요.')
+    setIsActionMenuOpen(false)
+  }
+
   return (
     <div className="relative -mt-[env(safe-area-inset-top)] flex min-h-app flex-col overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] text-white">
       <DetailBackgroundLoop />
@@ -62,13 +94,23 @@ function CommunityDetailPage() {
           <Link to={ROUTE_PATHS.notifications} aria-label="알림" className="rounded-full p-1">
             <Bell size={19} strokeWidth={2.1} />
           </Link>
-          <button type="button" aria-label="더보기" className="rounded-full p-1">
+          <button
+            type="button"
+            aria-label="더보기"
+            className="rounded-full p-1"
+            onClick={() => setIsActionMenuOpen(true)}
+          >
             <MoreVertical size={21} strokeWidth={2.6} />
           </button>
         </div>
       </header>
 
       <main className="relative z-1 flex-1 overflow-y-auto px-5 pb-28">
+        {actionMessage && (
+          <div className="mb-3 rounded-full bg-white/15 px-4 py-2 text-center text-xs font-bold text-white">
+            {actionMessage}
+          </div>
+        )}
         <article className="rounded-xl bg-[#071ed8] p-4 shadow-[0_10px_24px_rgb(0_0_0/0.18)]">
           <div className="flex items-start gap-3">
             <img src={thumbnail} alt="" className="h-12 w-12 rounded-md object-cover" />
@@ -127,7 +169,69 @@ function CommunityDetailPage() {
           <Send size={25} fill="currentColor" strokeWidth={1.8} />
         </button>
       </form>
+
+      {isActionMenuOpen && (
+        <CommunityActionMenu
+          onClose={() => setIsActionMenuOpen(false)}
+          onReport={handleReport}
+          onBlock={handleBlock}
+          onShare={handleShare}
+          isPending={reportPost.isPending || blockUser.isPending || shareUrl.isPending}
+        />
+      )}
     </div>
+  )
+}
+
+function CommunityActionMenu({
+  onClose,
+  onReport,
+  onBlock,
+  onShare,
+  isPending,
+}: {
+  onClose: () => void
+  onReport: () => void
+  onBlock: () => void
+  onShare: () => void
+  isPending: boolean
+}) {
+  return (
+    <div className="fixed inset-0 z-20 bg-[#08147a]/62" onClick={onClose}>
+      <div
+        role="menu"
+        aria-label="커뮤니티 게시글 메뉴"
+        className="absolute right-5 top-[calc(5.25rem+env(safe-area-inset-top))] w-[245px] overflow-hidden rounded-2xl bg-brand-blue shadow-[0_18px_35px_rgb(0_0_0/0.28)]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <ActionMenuButton label="신고하기" onClick={onReport} disabled={isPending} />
+        <ActionMenuButton label="차단하기" onClick={onBlock} disabled={isPending} />
+        <ActionMenuButton label="URL 공유하기" onClick={onShare} disabled={isPending} />
+      </div>
+    </div>
+  )
+}
+
+function ActionMenuButton({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string
+  onClick: () => void
+  disabled: boolean
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      disabled={disabled}
+      onClick={onClick}
+      className="flex h-15 w-full items-center gap-2 border-b border-white/10 px-5 text-left text-sm font-bold text-white last:border-b-0 disabled:text-white/45"
+    >
+      <span className="text-lg text-brand-lime">›</span>
+      {label}
+    </button>
   )
 }
 
@@ -172,6 +276,22 @@ function formatDate(value: string) {
   if (Number.isNaN(date.getTime())) return value
 
   return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+async function copyToClipboard(value: string) {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(value)
+    return
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = value
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
 }
 
 export default CommunityDetailPage
