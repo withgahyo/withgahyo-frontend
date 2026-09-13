@@ -8,22 +8,24 @@ import CommunityStateNotice from '../../features/community/components/CommunityS
 import CommunityTopActions from '../../features/community/components/CommunityTopActions'
 import CommunityWriteButton from '../../features/community/components/CommunityWriteButton'
 import RecommendedPostCard from '../../features/community/components/RecommendedPostCard'
+import type { CommunityPostSummaryResponse } from '../../api/community'
 import {
   useCommunityPosts,
   useRecommendedCommunityPosts,
 } from '../../features/community/hooks/useCommunityQueries'
+import type { CommunityFeedTab } from '../../features/community/tabs'
 
 function CommunityPage() {
   const [keyword, setKeyword] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>()
+  const [selectedTab, setSelectedTab] = useState<CommunityFeedTab>('recommended')
   const postParams = useMemo(
     () => ({
       keyword: keyword.trim() || undefined,
-      category: selectedCategory,
+      category: 'REVIEW',
       sort: 'latest',
       size: 10,
     }),
-    [keyword, selectedCategory],
+    [keyword],
   )
   const postsQuery = useCommunityPosts(postParams)
   const recommendationsQuery = useRecommendedCommunityPosts(5)
@@ -37,62 +39,116 @@ function CommunityPage() {
       <div className="relative z-1 px-5 pt-6">
         <CommunityTopActions />
         <CommunitySearchBar value={keyword} onChange={setKeyword} />
-        <CommunityCategoryTabs selectedCategory={selectedCategory} onSelect={setSelectedCategory} />
+        <CommunityCategoryTabs selectedTab={selectedTab} onSelect={setSelectedTab} />
       </div>
 
-      <main className="relative z-1 pt-6">
-        <section>
-          <CommunitySectionTitle title="부모님이 가장 만족한 여행후기" />
-          {recommendationsQuery.isLoading && (
-            <div className="mt-2 px-5">
-              <CommunityStateNotice title="인기 게시글을 불러오고 있어요." />
-            </div>
-          )}
-          {recommendationsQuery.isError && (
-            <div className="mt-2 px-5">
-              <CommunityStateNotice
-                title="인기 게시글을 불러오지 못했어요."
-                description="잠시 후 다시 시도해주세요."
-              />
-            </div>
-          )}
-          {!recommendationsQuery.isLoading &&
-            !recommendationsQuery.isError &&
-            recommendedPosts.length === 0 && (
-              <div className="mt-2 px-5">
-                <CommunityStateNotice title="아직 추천 게시글이 없어요." />
-              </div>
-            )}
-          {recommendedPosts.length > 0 && (
-            <div className="mt-2 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
-              {recommendedPosts.map((post, index) => (
-                <RecommendedPostCard key={post.postId} post={post} rank={index + 1} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="mt-7 px-5">
-          <CommunitySectionTitle title="가족 여행 전 꼭 봐야할 글" />
-          <div className="mt-3 space-y-3">
-            {postsQuery.isLoading && <CommunityStateNotice title="게시글을 불러오고 있어요." />}
-            {postsQuery.isError && (
-              <CommunityStateNotice
-                title="게시글을 불러오지 못했어요."
-                description="검색 조건을 확인하거나 잠시 후 다시 시도해주세요."
-              />
-            )}
-            {!postsQuery.isLoading && !postsQuery.isError && posts.length === 0 && (
-              <CommunityStateNotice title="조건에 맞는 게시글이 없어요." />
-            )}
-            {posts.map((post, index) => (
-              <CommunityPostListItem key={post.postId} post={post} imageIndex={index} />
-            ))}
-          </div>
-        </section>
+      <main className="relative z-1 pt-5">
+        {selectedTab === 'recommended' && (
+          <RecommendedReviewSection
+            isLoading={recommendationsQuery.isLoading}
+            isError={recommendationsQuery.isError}
+            posts={recommendedPosts}
+          />
+        )}
+        {selectedTab === 'all' && (
+          <AllReviewSection
+            isLoading={postsQuery.isLoading}
+            isError={postsQuery.isError}
+            posts={posts}
+          />
+        )}
+        {selectedTab === 'mine' && <MyReviewSection />}
       </main>
 
       <CommunityWriteButton />
+    </div>
+  )
+}
+
+interface ReviewSectionProps {
+  isLoading: boolean
+  isError: boolean
+  posts: CommunityPostSummaryResponse[]
+}
+
+function RecommendedReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
+  return (
+    <section>
+      <CommunitySectionTitle title="부모님이 가장 만족한 여행후기" />
+      {isLoading && (
+        <div className="mt-2 px-5">
+          <CommunityStateNotice title="추천 후기를 불러오고 있어요." />
+        </div>
+      )}
+      {isError && (
+        <div className="mt-2 px-5">
+          <CommunityStateNotice
+            title="추천 후기를 불러오지 못했어요."
+            description="잠시 후 다시 시도해주세요."
+          />
+        </div>
+      )}
+      {!isLoading && !isError && posts.length === 0 && (
+        <div className="mt-2 px-5">
+          <CommunityStateNotice title="아직 추천 후기가 없어요." />
+        </div>
+      )}
+      {posts.length > 0 && (
+        <div className="mt-2 flex snap-x gap-3 overflow-x-auto px-5 pb-1">
+          {posts.map((post, index) => (
+            <RecommendedPostCard key={post.postId} post={post} rank={index + 1} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function AllReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
+  return (
+    <section>
+      <CommunitySectionTitle title="전체 여행 후기" />
+      <div className="mt-3 space-y-3 px-5">
+        {isLoading && <CommunityStateNotice title="여행 후기를 불러오고 있어요." />}
+        {isError && (
+          <CommunityStateNotice
+            title="여행 후기를 불러오지 못했어요."
+            description="검색어를 확인하거나 잠시 후 다시 시도해주세요."
+          />
+        )}
+        {!isLoading && !isError && posts.length === 0 && (
+          <CommunityStateNotice title="조건에 맞는 여행 후기가 없어요." />
+        )}
+        {posts.map((post, index) => (
+          <CommunityPostListItem key={post.postId} post={post} imageIndex={index} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function MyReviewSection() {
+  return (
+    <div className="space-y-7">
+      <section>
+        <CommunitySectionTitle title="미작성한 후기" actionLabel="작성" />
+        <div className="mt-2 px-5">
+          <CommunityStateNotice
+            title="아직 작성할 후기가 없어요."
+            description="여행을 다녀오면 이곳에서 후기를 작성할 수 있어요."
+          />
+        </div>
+      </section>
+
+      <section>
+        <CommunitySectionTitle title="내가 작성한 후기" />
+        <div className="mt-3 px-5">
+          <CommunityStateNotice
+            title="아직 작성한 후기가 없어요."
+            description="부모님과 다녀온 여행 이야기를 남겨보세요."
+          />
+        </div>
+      </section>
     </div>
   )
 }

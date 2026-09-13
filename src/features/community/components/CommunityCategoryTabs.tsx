@@ -1,34 +1,28 @@
-const CATEGORIES = [
-  { value: undefined, label: '전체' },
-  { value: 'FREE', label: '자유' },
-  { value: 'QUESTION', label: '질문' },
-  { value: 'REVIEW', label: '후기' },
-  { value: 'INFO', label: '정보' },
-] as const
+import { COMMUNITY_FEED_TABS, type CommunityFeedTab } from '../tabs'
 
 interface CommunityCategoryTabsProps {
-  selectedCategory?: string
-  onSelect: (category?: string) => void
+  selectedTab: CommunityFeedTab
+  onSelect: (tab: CommunityFeedTab) => void
 }
 
-function CommunityCategoryTabs({ selectedCategory, onSelect }: CommunityCategoryTabsProps) {
+function CommunityCategoryTabs({ selectedTab, onSelect }: CommunityCategoryTabsProps) {
   return (
-    <div className="mt-3 flex gap-2 overflow-x-auto">
-      {CATEGORIES.map((category) => {
-        const isSelected = selectedCategory === category.value
+    <div className="mt-4 grid grid-cols-3 gap-2 rounded-full bg-[#1b2ee9]/70 p-1 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08)]">
+      {COMMUNITY_FEED_TABS.map((tab) => {
+        const isSelected = selectedTab === tab.value
 
         return (
           <button
-            key={category.label}
+            key={tab.value}
             type="button"
-            onClick={() => onSelect(category.value)}
-            className={`h-5 min-w-12 rounded-full border px-3 text-[10px] font-semibold ${
+            onClick={() => onSelect(tab.value)}
+            className={`h-8 rounded-full text-xs font-extrabold transition-colors ${
               isSelected
-                ? 'border-brand-lime bg-brand-lime text-brand-blue'
-                : 'border-white/35 bg-white/5 text-white'
+                ? 'bg-brand-lime text-brand-blue shadow-[0_4px_10px_rgb(0_0_0/0.12)]'
+                : 'text-white/75'
             }`}
           >
-            {category.label}
+            {tab.label}
           </button>
         )
       })}
