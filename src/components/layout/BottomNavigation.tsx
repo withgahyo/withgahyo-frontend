@@ -1,10 +1,10 @@
-import { Home, Image, Map, Plus, User } from 'lucide-react'
+import { Home, Image, MessageCircle, Plus, User } from 'lucide-react'
 import { Link, NavLink } from 'react-router-dom'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 
 const TAB_ITEMS = [
   { to: ROUTE_PATHS.home, label: '홈', Icon: Home },
-  { to: ROUTE_PATHS.popular, label: '인기 코스', Icon: Map },
+  { to: ROUTE_PATHS.community, label: '커뮤니티', Icon: MessageCircle },
   { to: ROUTE_PATHS.albums, label: '앨범', Icon: Image },
   { to: ROUTE_PATHS.mypage, label: '마이페이지', Icon: User },
 ] as const

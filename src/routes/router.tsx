@@ -14,6 +14,7 @@ import OnboardingConditionPage from '../pages/onboarding/OnboardingConditionPage
 import OnboardingCompletePage from '../pages/onboarding/OnboardingCompletePage'
 
 import HomePage from '../pages/home/HomePage'
+import CommunityPage from '../pages/community/CommunityPage'
 import PopularPage from '../pages/popular/PopularPage'
 import AlbumsPage from '../pages/albums/AlbumsPage'
 import AlbumDetailPage from '../pages/albums/AlbumDetailPage'
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
             element: <MainTabLayout />,
             children: [
               { path: ROUTE_PATHS.home, element: <HomePage /> },
+              { path: ROUTE_PATHS.community, element: <CommunityPage /> },
               { path: ROUTE_PATHS.popular, element: <PopularPage /> },
               { path: ROUTE_PATHS.albums, element: <AlbumsPage /> },
               { path: ROUTE_PATHS.mypage, element: <MyPage /> },
