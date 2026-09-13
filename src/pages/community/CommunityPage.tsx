@@ -8,13 +8,13 @@ import CommunityStateNotice from '../../features/community/components/CommunityS
 import CommunityTopActions from '../../features/community/components/CommunityTopActions'
 import CommunityWriteButton from '../../features/community/components/CommunityWriteButton'
 import PendingReviewCarousel from '../../features/community/components/PendingReviewCarousel'
-import type { PendingReviewItem } from '../../features/community/components/PendingReviewCarousel'
 import RecommendedPostCard from '../../features/community/components/RecommendedPostCard'
 import type { CommunityPostSummaryResponse } from '../../api/community'
 import {
   useCommunityPosts,
   useRecommendedCommunityPosts,
 } from '../../features/community/hooks/useCommunityQueries'
+import { usePendingReviews } from '../../features/review/hooks/useReviewQueries'
 import type { CommunityFeedTab } from '../../features/community/tabs'
 
 function CommunityPage() {
@@ -130,13 +130,29 @@ function AllReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
 }
 
 function MyReviewSection() {
-  const pendingReviews: PendingReviewItem[] = []
+  const pendingReviewsQuery = usePendingReviews()
+  const pendingReviews = pendingReviewsQuery.data?.reviews ?? []
 
   return (
     <div className="space-y-7">
       <section>
         <CommunitySectionTitle title="미작성한 후기" showAction={false} />
-        <PendingReviewCarousel items={pendingReviews} />
+        {pendingReviewsQuery.isLoading && (
+          <div className="mt-4 px-5">
+            <CommunityStateNotice title="작성할 후기를 불러오고 있어요." />
+          </div>
+        )}
+        {pendingReviewsQuery.isError && (
+          <div className="mt-4 px-5">
+            <CommunityStateNotice
+              title="작성할 후기를 불러오지 못했어요."
+              description="잠시 후 다시 시도해주세요."
+            />
+          </div>
+        )}
+        {!pendingReviewsQuery.isLoading && !pendingReviewsQuery.isError && (
+          <PendingReviewCarousel items={pendingReviews} />
+        )}
       </section>
 
       <section>

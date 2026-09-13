@@ -6,6 +6,9 @@ export const queryKeys = {
   communityRecommendations: (size: number) => ['community', 'recommendations', size] as const,
   communityPost: (postId: number) => ['community', 'posts', postId] as const,
   communityComments: (postId: number) => ['community', 'posts', postId, 'comments'] as const,
+  pendingReviews: ['reviews', 'pending'] as const,
+  reviewForm: (courseId: number) => ['reviews', 'form', courseId] as const,
+  myReview: (courseId: number) => ['reviews', 'me', courseId] as const,
 
   notifications: ['notifications'] as const,
 
