@@ -6,6 +6,7 @@ import CommunityCommentCard from '../../features/community/components/CommunityC
 import CommunityCommentComposer from '../../features/community/components/CommunityCommentComposer'
 import CommunityDetailHeader from '../../features/community/components/CommunityDetailHeader'
 import CommunityPostArticle from '../../features/community/components/CommunityPostArticle'
+import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
 import {
   useBlockCommunityUser,
   useCommunityComments,
@@ -14,11 +15,7 @@ import {
   useCreateCommunityComment,
   useReportCommunityPost,
 } from '../../features/community/hooks/useCommunityQueries'
-import {
-  COMMUNITY_THUMBNAILS,
-  MOCK_COMMUNITY_COMMENTS,
-  MOCK_COMMUNITY_DETAIL,
-} from '../../features/community/mock'
+import { COMMUNITY_THUMBNAILS } from '../../features/community/mock'
 import { copyToClipboard, getCommunityCategoryLabel } from '../../features/community/utils'
 
 function CommunityDetailPage() {
@@ -35,13 +32,14 @@ function CommunityDetailPage() {
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
 
-  const post = detailQuery.data ?? MOCK_COMMUNITY_DETAIL
-  const comments = commentsQuery.data?.comments.length
-    ? commentsQuery.data.comments
-    : MOCK_COMMUNITY_COMMENTS
+  const post = detailQuery.data
+  const comments = commentsQuery.data?.comments ?? []
   const thumbnail = useMemo(
-    () => COMMUNITY_THUMBNAILS[post.postId % COMMUNITY_THUMBNAILS.length],
-    [post.postId],
+    () =>
+      COMMUNITY_THUMBNAILS[
+        (post?.postId ?? safePostId ?? 0) % COMMUNITY_THUMBNAILS.length
+      ],
+    [post?.postId, safePostId],
   )
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -63,6 +61,7 @@ function CommunityDetailPage() {
   }
 
   async function handleBlock() {
+    if (!post) return
     await blockUser.mutateAsync(post.authorId)
     closeActionMenuWithMessage('작성자를 차단했어요.')
   }
@@ -83,7 +82,7 @@ function CommunityDetailPage() {
     <div className="relative -mt-[env(safe-area-inset-top)] flex min-h-app flex-col overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] text-white">
       <CommunityBackgroundLoop variant="detail" />
       <CommunityDetailHeader
-        title={getCommunityCategoryLabel(post.category)}
+        title={post ? getCommunityCategoryLabel(post.category) : '커뮤니티'}
         onBack={() => navigate(-1)}
         onOpenMenu={() => setIsActionMenuOpen(true)}
       />
@@ -94,23 +93,50 @@ function CommunityDetailPage() {
             {actionMessage}
           </div>
         )}
-        <CommunityPostArticle post={post} thumbnail={thumbnail} />
+        {detailQuery.isLoading && <CommunityStateNotice title="게시글을 불러오고 있어요." />}
+        {(detailQuery.isError || (!detailQuery.isLoading && !post)) && (
+          <CommunityStateNotice
+            title="게시글을 불러오지 못했어요."
+            description="삭제되었거나 접근할 수 없는 게시글일 수 있어요."
+          />
+        )}
+        {post && (
+          <>
+            <CommunityPostArticle post={post} thumbnail={thumbnail} />
 
-        <div className="mt-4 space-y-3">
-          {comments.map((item) => (
-            <CommunityCommentCard key={item.commentId} comment={item} thumbnail={thumbnail} />
-          ))}
-        </div>
+            <div className="mt-4 space-y-3">
+              {commentsQuery.isLoading && <CommunityStateNotice title="댓글을 불러오고 있어요." />}
+              {commentsQuery.isError && (
+                <CommunityStateNotice
+                  title="댓글을 불러오지 못했어요."
+                  description="잠시 후 다시 시도해주세요."
+                />
+              )}
+              {!commentsQuery.isLoading && !commentsQuery.isError && comments.length === 0 && (
+                <CommunityStateNotice title="아직 댓글이 없어요." />
+              )}
+              {comments.map((item) => (
+                <CommunityCommentCard
+                  key={item.commentId}
+                  comment={item}
+                  thumbnail={thumbnail}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </main>
 
-      <CommunityCommentComposer
-        value={comment}
-        isPending={createComment.isPending}
-        onChange={setComment}
-        onSubmit={handleSubmit}
-      />
+      {post && (
+        <CommunityCommentComposer
+          value={comment}
+          isPending={createComment.isPending}
+          onChange={setComment}
+          onSubmit={handleSubmit}
+        />
+      )}
 
-      {isActionMenuOpen && (
+      {post && isActionMenuOpen && (
         <CommunityActionMenu
           onClose={() => setIsActionMenuOpen(false)}
           onReport={handleReport}
