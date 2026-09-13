@@ -7,6 +7,8 @@ import CommunitySectionTitle from '../../features/community/components/Community
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
 import CommunityTopActions from '../../features/community/components/CommunityTopActions'
 import CommunityWriteButton from '../../features/community/components/CommunityWriteButton'
+import PendingReviewCarousel from '../../features/community/components/PendingReviewCarousel'
+import type { PendingReviewItem } from '../../features/community/components/PendingReviewCarousel'
 import RecommendedPostCard from '../../features/community/components/RecommendedPostCard'
 import type { CommunityPostSummaryResponse } from '../../api/community'
 import {
@@ -74,23 +76,23 @@ interface ReviewSectionProps {
 function RecommendedReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
   return (
     <section>
-      <CommunitySectionTitle title="부모님이 가장 만족한 여행후기" />
+      <CommunitySectionTitle title="좋아요 많은 여행 후기" />
       {isLoading && (
         <div className="mt-2 px-5">
-          <CommunityStateNotice title="추천 후기를 불러오고 있어요." />
+          <CommunityStateNotice title="인기 후기를 불러오고 있어요." />
         </div>
       )}
       {isError && (
         <div className="mt-2 px-5">
           <CommunityStateNotice
-            title="추천 후기를 불러오지 못했어요."
+            title="인기 후기를 불러오지 못했어요."
             description="잠시 후 다시 시도해주세요."
           />
         </div>
       )}
       {!isLoading && !isError && posts.length === 0 && (
         <div className="mt-2 px-5">
-          <CommunityStateNotice title="아직 추천 후기가 없어요." />
+          <CommunityStateNotice title="아직 인기 후기가 없어요." />
         </div>
       )}
       {posts.length > 0 && (
@@ -128,16 +130,13 @@ function AllReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
 }
 
 function MyReviewSection() {
+  const pendingReviews: PendingReviewItem[] = []
+
   return (
     <div className="space-y-7">
       <section>
-        <CommunitySectionTitle title="미작성한 후기" actionLabel="작성" />
-        <div className="mt-2 px-5">
-          <CommunityStateNotice
-            title="아직 작성할 후기가 없어요."
-            description="여행을 다녀오면 이곳에서 후기를 작성할 수 있어요."
-          />
-        </div>
+        <CommunitySectionTitle title="미작성한 후기" showAction={false} />
+        <PendingReviewCarousel items={pendingReviews} />
       </section>
 
       <section>
