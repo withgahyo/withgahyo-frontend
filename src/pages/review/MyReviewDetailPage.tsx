@@ -5,6 +5,7 @@ import courseDaejeon from '../../assets/home/course-daejeon.jpeg'
 import CommunityBackgroundLoop from '../../features/community/components/CommunityBackgroundLoop'
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
 import { useMyReview, useReviewForm } from '../../features/review/hooks/useReviewQueries'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 
 function MyReviewDetailPage() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ function MyReviewDetailPage() {
       <header className="relative z-1 flex h-18 items-center px-5">
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTE_PATHS.myReviews)}
           className="flex items-center gap-1 text-brand-lime"
           aria-label="뒤로가기"
         >

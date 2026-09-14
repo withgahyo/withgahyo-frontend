@@ -11,6 +11,7 @@ export const ROUTE_PATHS = {
 
   home: '/home',
   community: '/community',
+  communityWithTab: (tab: string) => `/community?tab=${tab}`,
   popular: '/popular',
   albums: '/albums',
   mypage: '/mypage',

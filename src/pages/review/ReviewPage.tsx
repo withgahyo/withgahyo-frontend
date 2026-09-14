@@ -10,6 +10,7 @@ import ReviewRatingField from '../../features/review/components/ReviewRatingFiel
 import ReviewRecommendationSlider from '../../features/review/components/ReviewRecommendationSlider'
 import { REVIEW_RECOMMENDATION_RANGE } from '../../features/review/formOptions'
 import { useCreateReview, useReviewForm } from '../../features/review/hooks/useReviewQueries'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 
 function ReviewPage() {
   const navigate = useNavigate()
@@ -61,7 +62,7 @@ function ReviewPage() {
       },
       {
         onSuccess: () => {
-          navigate('/community', { replace: true })
+          navigate(ROUTE_PATHS.communityWithTab('mine'), { replace: true })
         },
       },
     )
@@ -79,7 +80,7 @@ function ReviewPage() {
       <header className="relative z-1 flex h-18 items-center px-5">
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTE_PATHS.communityWithTab('mine'))}
           className="flex items-center gap-1 text-brand-lime"
           aria-label="뒤로가기"
         >

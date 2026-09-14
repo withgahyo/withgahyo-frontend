@@ -20,3 +20,9 @@ export function getCommunityFeedSectionTitles(tab: CommunityFeedTab) {
 
   return ['가족 여행 전 꼭 봐야할 글']
 }
+
+export function getCommunityFeedTabFromParam(value: string | null): CommunityFeedTab {
+  return COMMUNITY_FEED_TABS.some((tab) => tab.value === value)
+    ? (value as CommunityFeedTab)
+    : 'recommended'
+}

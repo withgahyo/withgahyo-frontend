@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import CommunityBackgroundLoop from '../../features/community/components/CommunityBackgroundLoop'
 import CommunityCategoryTabs from '../../features/community/components/CommunityCategoryTabs'
 import CommunityPostListItem from '../../features/community/components/CommunityPostListItem'
@@ -17,11 +18,15 @@ import {
   useRecommendedCommunityPosts,
 } from '../../features/community/hooks/useCommunityQueries'
 import { useMyReviews, usePendingReviews } from '../../features/review/hooks/useReviewQueries'
-import type { CommunityFeedTab } from '../../features/community/tabs'
+import {
+  getCommunityFeedTabFromParam,
+  type CommunityFeedTab,
+} from '../../features/community/tabs'
 
 function CommunityPage() {
   const [keyword, setKeyword] = useState('')
-  const [selectedTab, setSelectedTab] = useState<CommunityFeedTab>('recommended')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const selectedTab = getCommunityFeedTabFromParam(searchParams.get('tab'))
   const postParams = useMemo(
     () => ({
       keyword: keyword.trim() || undefined,
@@ -35,6 +40,9 @@ function CommunityPage() {
   const recommendationsQuery = useRecommendedCommunityPosts(5)
   const posts = postsQuery.data?.posts ?? []
   const recommendedPosts = recommendationsQuery.data?.posts ?? []
+  const handleSelectTab = (tab: CommunityFeedTab) => {
+    setSearchParams(tab === 'recommended' ? {} : { tab }, { replace: true })
+  }
 
   return (
     <div className="relative -mt-[env(safe-area-inset-top)] min-h-app overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] pb-[calc(6rem+env(safe-area-inset-bottom))] text-white">
@@ -43,7 +51,7 @@ function CommunityPage() {
       <div className="relative z-1 px-5 pt-6">
         <CommunityTopActions />
         <CommunitySearchBar value={keyword} onChange={setKeyword} />
-        <CommunityCategoryTabs selectedTab={selectedTab} onSelect={setSelectedTab} />
+        <CommunityCategoryTabs selectedTab={selectedTab} onSelect={handleSelectTab} />
       </div>
 
       <main className="relative z-1 pt-5">
