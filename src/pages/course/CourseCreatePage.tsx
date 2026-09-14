@@ -12,8 +12,10 @@ import {
 } from '../../api/course'
 import type { CreateCourseRequest } from '../../api/course'
 import { createCourseGeneration } from '../../api/courseGeneration'
+import BrandLoadingScreen from '../../components/common/BrandLoadingScreen'
 import PrimaryButton from '../../components/common/PrimaryButton'
 import CourseCreateHeader from '../../features/course/components/CourseCreateHeader'
+import CourseGenerationTips from '../../features/course/components/CourseGenerationTips'
 import CourseNameField from '../../features/course/components/CourseNameField'
 import RegionSelectField from '../../features/course/components/RegionSelectField'
 import KeywordSelectSection from '../../features/course/components/KeywordSelectSection'
@@ -93,10 +95,10 @@ function CourseCreatePage() {
       return { courseId: course.courseId, generationId: generation.generationId }
     },
     onSuccess: ({ courseId, generationId }) => {
-      navigate(
-        ROUTE_PATHS.courseGenerating(String(courseId), String(generationId)),
-        { state: { courseName: form.courseName }, replace: true },
-      )
+      navigate(ROUTE_PATHS.courseGenerating(String(courseId), String(generationId)), {
+        state: { courseName: form.courseName },
+        replace: true,
+      })
     },
   })
   const findFamilyCandidateMutation = useMutation({
@@ -190,6 +192,7 @@ function CourseCreatePage() {
 
   const handleGenerate = () => {
     if (!isFormValid || !form.region || !form.startDate || !form.endDate) return
+    if (generateCourseMutation.isPending) return
 
     generateCourseMutation.mutate({
       title: form.courseName,
@@ -227,6 +230,20 @@ function CourseCreatePage() {
       familyUserId: candidate.userId,
       relationship: familyRelationship,
     })
+  }
+
+  // createCourse → createCourseGeneration 요청이 끝날 때까지 전체 화면 로딩으로 전환한다.
+  // 아직 generationId가 없어 polling 전이므로 progress는 절대 넘기지 않는다(indeterminate).
+  if (generateCourseMutation.isPending) {
+    return (
+      <BrandLoadingScreen
+        message="여행 코스를 준비하고 있어요"
+        description="입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있어요."
+        srMessage="입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있습니다"
+      >
+        <CourseGenerationTips />
+      </BrandLoadingScreen>
+    )
   }
 
   return (
@@ -303,7 +320,7 @@ function CourseCreatePage() {
             disabled={!isFormValid || generateCourseMutation.isPending}
             onClick={handleGenerate}
           >
-            {generateCourseMutation.isPending ? '생성 중...' : 'AI 코스 생성하기'}
+            AI 코스 생성하기
           </PrimaryButton>
         </div>
       </div>
