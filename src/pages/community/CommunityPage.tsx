@@ -7,6 +7,7 @@ import CommunitySectionTitle from '../../features/community/components/Community
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
 import CommunityTopActions from '../../features/community/components/CommunityTopActions'
 import CommunityWriteButton from '../../features/community/components/CommunityWriteButton'
+import MyReviewListItem from '../../features/community/components/MyReviewListItem'
 import PendingReviewCarousel from '../../features/community/components/PendingReviewCarousel'
 import RecommendedPostCard from '../../features/community/components/RecommendedPostCard'
 import type { CommunityPostSummaryResponse } from '../../api/community'
@@ -14,7 +15,7 @@ import {
   useCommunityPosts,
   useRecommendedCommunityPosts,
 } from '../../features/community/hooks/useCommunityQueries'
-import { usePendingReviews } from '../../features/review/hooks/useReviewQueries'
+import { useMyReviews, usePendingReviews } from '../../features/review/hooks/useReviewQueries'
 import type { CommunityFeedTab } from '../../features/community/tabs'
 
 function CommunityPage() {
@@ -131,7 +132,9 @@ function AllReviewSection({ isLoading, isError, posts }: ReviewSectionProps) {
 
 function MyReviewSection() {
   const pendingReviewsQuery = usePendingReviews()
+  const myReviewsQuery = useMyReviews()
   const pendingReviews = pendingReviewsQuery.data?.reviews ?? []
+  const myReviews = myReviewsQuery.data?.reviews ?? []
 
   return (
     <div className="space-y-7">
@@ -157,11 +160,25 @@ function MyReviewSection() {
 
       <section>
         <CommunitySectionTitle title="내가 작성한 후기" />
-        <div className="mt-3 px-5">
-          <CommunityStateNotice
-            title="아직 작성한 후기가 없어요."
-            description="부모님과 다녀온 여행 이야기를 남겨보세요."
-          />
+        <div className="mt-3 space-y-3 px-5">
+          {myReviewsQuery.isLoading && (
+            <CommunityStateNotice title="작성한 후기를 불러오고 있어요." />
+          )}
+          {myReviewsQuery.isError && (
+            <CommunityStateNotice
+              title="작성한 후기를 불러오지 못했어요."
+              description="잠시 후 다시 시도해주세요."
+            />
+          )}
+          {!myReviewsQuery.isLoading && !myReviewsQuery.isError && myReviews.length === 0 && (
+            <CommunityStateNotice
+              title="아직 작성한 후기가 없어요."
+              description="부모님과 다녀온 여행 이야기를 남겨보세요."
+            />
+          )}
+          {myReviews.map((review) => (
+            <MyReviewListItem key={review.reviewId} review={review} />
+          ))}
         </div>
       </section>
     </div>

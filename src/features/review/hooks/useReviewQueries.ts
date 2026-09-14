@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createReview,
   getMyReview,
+  getMyReviews,
   getPendingReviews,
   getReviewForm,
   updateMyReview,
@@ -14,6 +15,14 @@ export function usePendingReviews() {
   return useQuery({
     queryKey: queryKeys.pendingReviews,
     queryFn: getPendingReviews,
+    retry: false,
+  })
+}
+
+export function useMyReviews() {
+  return useQuery({
+    queryKey: queryKeys.myReviews,
+    queryFn: getMyReviews,
     retry: false,
   })
 }
@@ -43,6 +52,7 @@ export function useCreateReview(courseId: number | null) {
     mutationFn: (request: CreateReviewRequest) => createReview(courseId as number, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.pendingReviews })
+      queryClient.invalidateQueries({ queryKey: queryKeys.myReviews })
       if (courseId != null) {
         queryClient.invalidateQueries({ queryKey: queryKeys.myReview(courseId) })
       }
@@ -56,6 +66,7 @@ export function useUpdateMyReview(courseId: number | null) {
   return useMutation({
     mutationFn: (request: UpdateReviewRequest) => updateMyReview(courseId as number, request),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.myReviews })
       if (courseId != null) {
         queryClient.invalidateQueries({ queryKey: queryKeys.myReview(courseId) })
       }

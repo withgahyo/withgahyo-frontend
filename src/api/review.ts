@@ -51,9 +51,32 @@ export interface ReviewResponse {
   updatedAt: string
 }
 
+export interface MyReviewItemResponse {
+  reviewId: number
+  course: PendingReviewItemResponse
+  rating: number
+  comment: string | null
+  recommendationScore: number
+  highlights: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MyReviewListResponse {
+  reviews: MyReviewItemResponse[]
+}
+
 export async function getPendingReviews() {
   const response = await apiClient.get<BackendApiResponse<PendingReviewListResponse>>(
     '/api/v1/users/me/reviews/pending',
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function getMyReviews() {
+  const response = await apiClient.get<BackendApiResponse<MyReviewListResponse>>(
+    '/api/v1/users/me/reviews',
   )
 
   return unwrapApiResponse(response.data)
