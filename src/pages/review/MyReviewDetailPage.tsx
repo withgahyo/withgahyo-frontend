@@ -1,9 +1,12 @@
-import { ChevronLeft, Star } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { resolveApiAssetUrl } from '../../api/assetUrl'
-import courseDaejeon from '../../assets/home/course-daejeon.jpeg'
 import CommunityBackgroundLoop from '../../features/community/components/CommunityBackgroundLoop'
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
+import ReviewCourseSummaryCard from '../../features/review/components/ReviewCourseSummaryCard'
+import ReviewHighlightField from '../../features/review/components/ReviewHighlightField'
+import ReviewMemoField from '../../features/review/components/ReviewMemoField'
+import ReviewRatingField from '../../features/review/components/ReviewRatingField'
+import ReviewRecommendationSlider from '../../features/review/components/ReviewRecommendationSlider'
 import { useMyReview, useReviewForm } from '../../features/review/hooks/useReviewQueries'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 
@@ -16,8 +19,7 @@ function MyReviewDetailPage() {
   const reviewQuery = useMyReview(validCourseId)
   const reviewFormQuery = useReviewForm(validCourseId)
   const review = reviewQuery.data
-  const course = reviewFormQuery.data?.course
-  const imageUrl = resolveApiAssetUrl(course?.imageUrl ?? null) ?? courseDaejeon
+  const reviewForm = reviewFormQuery.data
 
   return (
     <main className="relative -mt-[env(safe-area-inset-top)] min-h-app overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] pb-8 text-white">
@@ -35,63 +37,40 @@ function MyReviewDetailPage() {
         </button>
       </header>
 
-      <section className="relative z-1 px-5">
-        {reviewQuery.isLoading && <CommunityStateNotice title="후기를 불러오고 있어요." />}
-        {(reviewQuery.isError || validCourseId == null) && (
+      <section className="relative z-1 mx-2 rounded-t-card bg-white px-5 pb-7 pt-6">
+        {(reviewQuery.isLoading || reviewFormQuery.isLoading) && (
+          <CommunityStateNotice title="후기를 불러오고 있어요." />
+        )}
+        {(reviewQuery.isError || reviewFormQuery.isError || validCourseId == null) && (
           <CommunityStateNotice
             title="후기를 불러오지 못했어요."
             description="잠시 후 다시 시도해주세요."
           />
         )}
 
-        {review && (
-          <article className="rounded-xl bg-[#071ed8] p-4 shadow-[0_8px_18px_rgb(0_0_0/0.18)]">
-            <div className="flex items-center gap-3">
-              <img src={imageUrl} alt="" className="h-16 w-16 shrink-0 rounded-md object-cover" />
-              <div className="min-w-0 flex-1">
-                <h1 className="truncate text-base font-extrabold">
-                  {course?.title ?? '여행 후기'}
-                </h1>
-                {course && (
-                  <p className="mt-1 text-[10px] font-semibold text-white/60">{course.period}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-5 flex items-center gap-1 text-brand-lime">
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <Star
-                  key={rating}
-                  aria-hidden="true"
-                  size={22}
-                  fill={rating <= review.rating ? 'currentColor' : 'none'}
-                  strokeWidth={1.8}
-                />
-              ))}
-              <span className="ml-2 text-sm font-black">{review.rating.toFixed(1)} / 5.0</span>
-            </div>
-
-            {review.highlights.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {review.highlights.map((highlight) => (
-                  <span
-                    key={highlight}
-                    className="rounded-full bg-brand-lime px-2.5 py-1 text-[10px] font-black text-brand-blue"
-                  >
-                    {highlight}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <p className="mt-5 whitespace-pre-line text-sm font-semibold leading-6 text-white/90">
-              {review.comment || '남긴 한줄 후기가 없어요.'}
-            </p>
-
-            <div className="mt-5 rounded-lg bg-white/10 px-3 py-2 text-xs font-extrabold text-white/80">
-              추천 의향 {review.recommendationScore} / 10
-            </div>
-          </article>
+        {review && reviewForm && (
+          <div className="space-y-2.5">
+            <ReviewCourseSummaryCard course={reviewForm.course} />
+            <ReviewRatingField value={review.rating} onChange={() => undefined} readOnly />
+            <ReviewHighlightField
+              values={review.highlights}
+              onToggle={() => undefined}
+              options={reviewForm.highlightOptions}
+              readOnly
+            />
+            <ReviewMemoField
+              value={review.comment || '남긴 한줄 후기가 없어요.'}
+              onChange={() => undefined}
+              readOnly
+            />
+            <ReviewRecommendationSlider
+              value={review.recommendationScore}
+              onChange={() => undefined}
+              min={reviewForm.recommendationMin}
+              max={reviewForm.recommendationMax}
+              readOnly
+            />
+          </div>
         )}
       </section>
     </main>

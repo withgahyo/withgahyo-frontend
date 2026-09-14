@@ -4,9 +4,15 @@ interface ReviewHighlightFieldProps {
   values: string[]
   onToggle: (value: string) => void
   options?: string[]
+  readOnly?: boolean
 }
 
-function ReviewHighlightField({ values, onToggle, options }: ReviewHighlightFieldProps) {
+function ReviewHighlightField({
+  values,
+  onToggle,
+  options,
+  readOnly = false,
+}: ReviewHighlightFieldProps) {
   const highlightOptions = options ?? REVIEW_HIGHLIGHT_OPTIONS.map((option) => option.label)
 
   return (
@@ -19,12 +25,13 @@ function ReviewHighlightField({ values, onToggle, options }: ReviewHighlightFiel
             <button
               key={option}
               type="button"
+              disabled={readOnly}
               onClick={() => onToggle(option)}
               className={`h-6 rounded-full border text-[10px] font-extrabold ${
                 isSelected
                   ? 'border-brand-lime bg-brand-lime text-brand-blue'
                   : 'border-brand-blue bg-white text-brand-blue'
-              }`}
+              } ${readOnly ? 'cursor-default' : ''}`}
             >
               {option}
             </button>

@@ -3,9 +3,10 @@ import { Star } from 'lucide-react'
 interface ReviewRatingFieldProps {
   value: number
   onChange: (value: number) => void
+  readOnly?: boolean
 }
 
-function ReviewRatingField({ value, onChange }: ReviewRatingFieldProps) {
+function ReviewRatingField({ value, onChange, readOnly = false }: ReviewRatingFieldProps) {
   return (
     <section className="rounded-lg border border-ink/15 bg-white px-4 py-4 text-center shadow-[0_3px_8px_rgb(20_20_43/0.05)]">
       <h2 className="text-sm font-extrabold text-ink/75">이번 여행에 얼마나 만족하시나요?</h2>
@@ -17,8 +18,11 @@ function ReviewRatingField({ value, onChange }: ReviewRatingFieldProps) {
               key={rating}
               type="button"
               aria-label={`${rating}점`}
+              disabled={readOnly}
               onClick={() => onChange(rating)}
-              className={isSelected ? 'text-brand-blue' : 'text-gray-300'}
+              className={`${isSelected ? 'text-brand-blue' : 'text-gray-300'} ${
+                readOnly ? 'cursor-default' : ''
+              }`}
             >
               <Star aria-hidden="true" size={32} fill="currentColor" strokeWidth={1.5} />
             </button>
