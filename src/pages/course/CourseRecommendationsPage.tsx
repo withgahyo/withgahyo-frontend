@@ -1,7 +1,10 @@
 import { ChevronLeft, Pencil, RefreshCw } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import vectorDecoration from '../../assets/splash/Vector.svg'
+import ConfirmLeaveModal from '../../components/common/ConfirmLeaveModal'
+import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning'
 import RecommendedCourseCard from '../../features/course/components/RecommendedCourseCard'
+import { useGenerationExitBlocker } from '../../features/course/hooks/useGenerationExitBlocker'
 import {
   useCourseCandidates,
   useSelectCourseCandidate,
@@ -28,10 +31,16 @@ function CourseRecommendationsPage() {
 
   const candidates = candidatesQuery.data?.candidates ?? []
 
+  // 후보를 아직 확정하지 않은 동안에는 flow 밖으로 나가는 이동을 막는다.
+  const isUnconfirmed = hasValidParams
+  const { blocker, allowNextNavigation } = useGenerationExitBlocker(isUnconfirmed)
+  useBeforeUnloadWarning(isUnconfirmed)
+
   const handleSelect = (candidateId: number) => {
     if (selectMutation.isPending) return
     selectMutation.mutate(candidateId, {
       onSuccess: (data) => {
+        allowNextNavigation()
         navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
       },
     })
@@ -40,6 +49,13 @@ function CourseRecommendationsPage() {
   return (
     // CourseCreatePage와 동일하게 Hero는 고정, 흰 Sheet 내부에서만 스크롤한다.
     <div className="relative -mt-[env(safe-area-inset-top)] -mb-[env(safe-area-inset-bottom)] flex h-app flex-col overflow-hidden">
+      <ConfirmLeaveModal
+        isOpen={blocker.state === 'blocked'}
+        title="아직 코스를 확정하지 않았어요"
+        description={'지금 나가면 생성된 추천 코스를 선택하지 못해요.\n그래도 나가시겠어요?'}
+        onStay={() => blocker.reset?.()}
+        onLeave={() => blocker.proceed?.()}
+      />
       <div className="relative shrink-0 overflow-hidden bg-brand-blue">
         <img
           src={vectorDecoration}
@@ -114,9 +130,7 @@ function CourseRecommendationsPage() {
             </p>
           ) : candidates.length === 0 ? (
             <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
-              <p className="text-base font-semibold text-ink">
-                추천 가능한 코스를 찾지 못했어요
-              </p>
+              <p className="text-base font-semibold text-ink">추천 가능한 코스를 찾지 못했어요</p>
               <p className="text-caption text-gray-400">
                 여행 조건을 조금 바꿔서 다시 시도해보세요.
               </p>
@@ -151,8 +165,7 @@ function CourseRecommendationsPage() {
                   generationId={generationId ?? ''}
                   onSelect={handleSelect}
                   isSelecting={
-                    selectMutation.isPending &&
-                    selectMutation.variables === candidate.candidateId
+                    selectMutation.isPending && selectMutation.variables === candidate.candidateId
                   }
                   disabled={selectMutation.isPending}
                 />

@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmLeaveModal from '../../components/common/ConfirmLeaveModal'
+import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning'
 import CourseDetailSheet from '../../features/course/components/CourseDetailSheet'
 import CourseMap from '../../features/course/components/CourseMap'
+import { useGenerationExitBlocker } from '../../features/course/hooks/useGenerationExitBlocker'
 import {
   useCourseCandidateDetail,
   useSelectCourseCandidate,
@@ -47,6 +50,11 @@ function CourseCandidateDetailPage() {
   )
   const selectMutation = useSelectCourseCandidate(hasValidParams ? numericGenerationId : null)
 
+  // 후보를 아직 확정하지 않은 동안에는 flow 밖으로 나가는 이동을 막는다.
+  const isUnconfirmed = hasValidParams
+  const { blocker, allowNextNavigation } = useGenerationExitBlocker(isUnconfirmed)
+  useBeforeUnloadWarning(isUnconfirmed)
+
   const [sheetState, setSheetState] = useState<SheetState>('expanded')
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null)
   const [cameraTick, setCameraTick] = useState(0)
@@ -82,6 +90,7 @@ function CourseCandidateDetailPage() {
     if (!hasValidParams || selectMutation.isPending) return
     selectMutation.mutate(numericCandidateId as number, {
       onSuccess: (data) => {
+        allowNextNavigation()
         navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
       },
     })
@@ -92,6 +101,16 @@ function CourseCandidateDetailPage() {
 
   return (
     <div className="relative -mt-[env(safe-area-inset-top)] -mb-[env(safe-area-inset-bottom)] flex h-app flex-col overflow-hidden bg-surface-muted">
+      <ConfirmLeaveModal
+        isOpen={blocker.state === 'blocked'}
+        title="아직 코스를 확정하지 않았어요"
+        description={
+          '지금 나가면 생성된 추천 코스를 선택하지 못할 수 있어요.\n그래도 나가시겠어요?'
+        }
+        onStay={() => blocker.reset?.()}
+        onLeave={() => blocker.proceed?.()}
+      />
+
       <button
         type="button"
         onClick={handleBack}
