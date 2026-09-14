@@ -34,4 +34,6 @@ export const ROUTE_PATHS = {
   communityPost: (postId: string | number) => `/community/${postId}`,
   notifications: '/notifications',
   review: (courseId: string) => `/reviews/${courseId}`,
+  myReviews: '/reviews/me',
+  myReviewDetail: (courseId: string | number) => `/reviews/me/${courseId}`,
 } as const

@@ -11,6 +11,7 @@ import MyReviewListItem from '../../features/community/components/MyReviewListIt
 import PendingReviewCarousel from '../../features/community/components/PendingReviewCarousel'
 import RecommendedPostCard from '../../features/community/components/RecommendedPostCard'
 import type { CommunityPostSummaryResponse } from '../../api/community'
+import { ROUTE_PATHS } from '../../routes/routePaths'
 import {
   useCommunityPosts,
   useRecommendedCommunityPosts,
@@ -135,6 +136,7 @@ function MyReviewSection() {
   const myReviewsQuery = useMyReviews()
   const pendingReviews = pendingReviewsQuery.data?.reviews ?? []
   const myReviews = myReviewsQuery.data?.reviews ?? []
+  const previewMyReviews = myReviews.slice(0, 4)
 
   return (
     <div className="space-y-7">
@@ -159,7 +161,11 @@ function MyReviewSection() {
       </section>
 
       <section>
-        <CommunitySectionTitle title="내가 작성한 후기" />
+        <CommunitySectionTitle
+          title="내가 작성한 후기"
+          showAction={myReviews.length > 0}
+          actionTo={ROUTE_PATHS.myReviews}
+        />
         <div className="mt-3 space-y-3 px-5">
           {myReviewsQuery.isLoading && (
             <CommunityStateNotice title="작성한 후기를 불러오고 있어요." />
@@ -176,7 +182,7 @@ function MyReviewSection() {
               description="부모님과 다녀온 여행 이야기를 남겨보세요."
             />
           )}
-          {myReviews.map((review) => (
+          {previewMyReviews.map((review) => (
             <MyReviewListItem key={review.reviewId} review={review} />
           ))}
         </div>

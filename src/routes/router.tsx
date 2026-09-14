@@ -33,6 +33,8 @@ import CourseDetailPage from '../pages/course/CourseDetailPage'
 
 import NotificationPage from '../pages/notification/NotificationPage'
 import ReviewPage from '../pages/review/ReviewPage'
+import MyReviewDetailPage from '../pages/review/MyReviewDetailPage'
+import MyReviewsPage from '../pages/review/MyReviewsPage'
 import NotFoundPage from '../pages/not-found/NotFoundPage'
 
 import AuthGuard from './AuthGuard'
@@ -121,6 +123,8 @@ export const router = createBrowserRouter([
               { path: ROUTE_PATHS.mypagePreferences, element: <TravelPreferenceEditPage /> },
               { path: ROUTE_PATHS.support, element: <SupportChatPage /> },
               { path: ROUTE_PATHS.terms, element: <TermsPage /> },
+              { path: ROUTE_PATHS.myReviews, element: <MyReviewsPage /> },
+              { path: '/reviews/me/:courseId', element: <MyReviewDetailPage /> },
               { path: '/reviews/:courseId', element: <ReviewPage /> },
             ],
           },

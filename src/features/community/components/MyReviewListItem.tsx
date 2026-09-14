@@ -15,7 +15,7 @@ function MyReviewListItem({ review }: MyReviewListItemProps) {
 
   return (
     <Link
-      to={ROUTE_PATHS.courseDetail(String(review.course.courseId))}
+      to={ROUTE_PATHS.myReviewDetail(review.course.courseId)}
       className="flex min-h-20 items-center rounded-xl bg-[#071ed8] p-2.5 shadow-[0_8px_18px_rgb(0_0_0/0.18)]"
     >
       <img src={imageUrl} alt="" className="h-14 w-14 shrink-0 rounded-md object-cover" />
