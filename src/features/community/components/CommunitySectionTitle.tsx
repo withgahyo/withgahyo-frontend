@@ -26,15 +26,6 @@ function CommunitySectionTitle({
           <ChevronRight aria-hidden="true" size={14} strokeWidth={3} />
         </Link>
       )}
-      {showAction && !actionTo && (
-        <button
-          type="button"
-          className="flex items-center gap-0.5 text-[10px] font-bold text-brand-lime"
-        >
-          {actionLabel}
-          <ChevronRight aria-hidden="true" size={14} strokeWidth={3} />
-        </button>
-      )}
     </div>
   )
 }

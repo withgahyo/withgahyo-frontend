@@ -3,19 +3,24 @@ import { queryKeys } from '../../../constants/queryKeys'
 import {
   blockCommunityUser,
   createCommunityComment,
+  createCommunityPost,
   getCommunityComments,
   getCommunityPostDetail,
   getCommunityPosts,
   getCommunityPostShareUrl,
   getRecommendedCommunityPosts,
+  likeCommunityPost,
   reportCommunityPost,
+  unlikeCommunityPost,
   type CreateCommunityCommentRequest,
+  type CreateCommunityPostRequest,
   type ReportCommunityPostRequest,
 } from '../../../api/community'
 
 export function useCommunityPosts(params?: {
   keyword?: string
-  category?: string
+  regionName?: string
+  highlightType?: string
   sort?: string
   cursor?: string | null
   size?: number
@@ -32,6 +37,18 @@ export function useRecommendedCommunityPosts(size = 6) {
     queryKey: queryKeys.communityRecommendations(size),
     queryFn: () => getRecommendedCommunityPosts(size),
     retry: false,
+  })
+}
+
+export function useCreateCommunityPost() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (request: CreateCommunityPostRequest) => createCommunityPost(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communityPostLists })
+      queryClient.invalidateQueries({ queryKey: queryKeys.communityRecommendations(5) })
+    },
   })
 }
 
@@ -82,5 +99,20 @@ export function useBlockCommunityUser() {
 export function useCommunityPostShareUrl(postId: number | null) {
   return useMutation({
     mutationFn: () => getCommunityPostShareUrl(postId as number),
+  })
+}
+
+export function useToggleCommunityPostLike(postId: number | null) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (likedByMe: boolean) =>
+      likedByMe ? unlikeCommunityPost(postId as number) : likeCommunityPost(postId as number),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.communityPostLists })
+      if (postId != null) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.communityPost(postId) })
+      }
+    },
   })
 }

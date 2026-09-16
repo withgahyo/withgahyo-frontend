@@ -7,6 +7,7 @@ import CommunityCommentComposer from '../../features/community/components/Commun
 import CommunityDetailHeader from '../../features/community/components/CommunityDetailHeader'
 import CommunityPostArticle from '../../features/community/components/CommunityPostArticle'
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
+import { resolveApiAssetUrl } from '../../api/assetUrl'
 import {
   useBlockCommunityUser,
   useCommunityComments,
@@ -16,7 +17,10 @@ import {
   useReportCommunityPost,
 } from '../../features/community/hooks/useCommunityQueries'
 import { COMMUNITY_THUMBNAILS } from '../../features/community/mock'
-import { copyToClipboard, getCommunityCategoryLabel } from '../../features/community/utils'
+import {
+  copyToClipboard,
+  getCommunityPostCategoryLabel,
+} from '../../features/community/utils'
 
 function CommunityDetailPage() {
   const navigate = useNavigate()
@@ -36,6 +40,7 @@ function CommunityDetailPage() {
   const comments = commentsQuery.data?.comments ?? []
   const thumbnail = useMemo(
     () =>
+      resolveApiAssetUrl(post?.courseImageUrl ?? null) ??
       COMMUNITY_THUMBNAILS[
         (post?.postId ?? safePostId ?? 0) % COMMUNITY_THUMBNAILS.length
       ],
@@ -82,7 +87,7 @@ function CommunityDetailPage() {
     <div className="relative -mt-[env(safe-area-inset-top)] flex min-h-app flex-col overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] text-white">
       <CommunityBackgroundLoop variant="detail" />
       <CommunityDetailHeader
-        title={post ? getCommunityCategoryLabel(post.category) : '커뮤니티'}
+        title={post ? getCommunityPostCategoryLabel(post) : '커뮤니티'}
         onBack={() => navigate(-1)}
         onOpenMenu={() => setIsActionMenuOpen(true)}
       />

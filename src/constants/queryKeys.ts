@@ -2,6 +2,7 @@ export const queryKeys = {
   home: ['home'] as const,
 
   popular: ['popular'] as const,
+  communityPostLists: ['community', 'posts'] as const,
   communityPosts: (params: object) => ['community', 'posts', params] as const,
   communityRecommendations: (size: number) => ['community', 'recommendations', size] as const,
   communityPost: (postId: number) => ['community', 'posts', postId] as const,

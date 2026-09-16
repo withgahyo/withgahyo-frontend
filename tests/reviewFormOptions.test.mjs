@@ -4,6 +4,7 @@ import {
   REVIEW_HIGHLIGHT_OPTIONS,
   REVIEW_RECOMMENDATION_RANGE,
 } from '../src/features/review/formOptions.ts'
+import { toCreateCommunityPostRequest } from '../src/features/review/share.ts'
 
 test('review form exposes six travel highlight options', () => {
   assert.deepEqual(
@@ -18,4 +19,8 @@ test('review recommendation range uses a ten point scale', () => {
     max: 10,
     defaultValue: 2,
   })
+})
+
+test('review creation response can be converted to a community post request', () => {
+  assert.deepEqual(toCreateCommunityPostRequest({ reviewId: 9912 }), { reviewId: 9912 })
 })

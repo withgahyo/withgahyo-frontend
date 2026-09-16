@@ -2,11 +2,7 @@ import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CommunityBackgroundLoop from '../../features/community/components/CommunityBackgroundLoop'
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
-import ReviewCourseSummaryCard from '../../features/review/components/ReviewCourseSummaryCard'
-import ReviewHighlightField from '../../features/review/components/ReviewHighlightField'
-import ReviewMemoField from '../../features/review/components/ReviewMemoField'
-import ReviewRatingField from '../../features/review/components/ReviewRatingField'
-import ReviewRecommendationSlider from '../../features/review/components/ReviewRecommendationSlider'
+import MyReviewArticle from '../../features/review/components/MyReviewArticle'
 import { useMyReview, useReviewForm } from '../../features/review/hooks/useReviewQueries'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 
@@ -22,10 +18,10 @@ function MyReviewDetailPage() {
   const reviewForm = reviewFormQuery.data
 
   return (
-    <main className="relative -mt-[env(safe-area-inset-top)] min-h-app overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] pb-8 text-white">
-      <CommunityBackgroundLoop />
+    <div className="relative -mt-[env(safe-area-inset-top)] flex min-h-app flex-col overflow-hidden bg-brand-blue pt-[env(safe-area-inset-top)] text-white">
+      <CommunityBackgroundLoop variant="detail" />
 
-      <header className="relative z-1 flex h-18 items-center px-5">
+      <header className="relative z-1 flex h-16 items-center px-5">
         <button
           type="button"
           onClick={() => navigate(ROUTE_PATHS.myReviews)}
@@ -37,7 +33,7 @@ function MyReviewDetailPage() {
         </button>
       </header>
 
-      <section className="relative z-1 mx-2 rounded-t-card bg-white px-5 pb-7 pt-6">
+      <main className="relative z-1 flex-1 overflow-y-auto px-5 pb-10">
         {(reviewQuery.isLoading || reviewFormQuery.isLoading) && (
           <CommunityStateNotice title="후기를 불러오고 있어요." />
         )}
@@ -49,31 +45,14 @@ function MyReviewDetailPage() {
         )}
 
         {review && reviewForm && (
-          <div className="space-y-2.5">
-            <ReviewCourseSummaryCard course={reviewForm.course} />
-            <ReviewRatingField value={review.rating} onChange={() => undefined} readOnly />
-            <ReviewHighlightField
-              values={review.highlights}
-              onToggle={() => undefined}
-              options={reviewForm.highlightOptions}
-              readOnly
-            />
-            <ReviewMemoField
-              value={review.comment || '남긴 한줄 후기가 없어요.'}
-              onChange={() => undefined}
-              readOnly
-            />
-            <ReviewRecommendationSlider
-              value={review.recommendationScore}
-              onChange={() => undefined}
-              min={reviewForm.recommendationMin}
-              max={reviewForm.recommendationMax}
-              readOnly
-            />
-          </div>
+          <MyReviewArticle
+            review={review}
+            course={reviewForm.course}
+            recommendationMax={reviewForm.recommendationMax}
+          />
         )}
-      </section>
-    </main>
+      </main>
+    </div>
   )
 }
 

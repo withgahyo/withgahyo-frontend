@@ -15,11 +15,19 @@ export interface CommunityPostSummaryResponse {
   postId: number
   authorId: number
   authorNickname: string
-  category: string
-  title: string
-  contentPreview: string
+  authorProfileImageUrl?: string | null
+  courseId?: number
+  courseTitle?: string
+  regionName?: string
+  courseImageUrl?: string | null
+  rating?: number
+  highlights?: string[]
+  category?: string
+  title?: string
+  contentPreview: string | null
   commentCount: number
   likeCount: number
+  likedByMe?: boolean
   createdAt: string
 }
 
@@ -33,11 +41,19 @@ export interface CommunityPostDetailResponse {
   postId: number
   authorId: number
   authorNickname: string
-  category: string
-  title: string
-  content: string
+  authorProfileImageUrl?: string | null
+  courseId?: number
+  courseTitle?: string
+  regionName?: string
+  courseImageUrl?: string | null
+  rating?: number
+  highlights?: string[]
+  category?: string
+  title?: string
+  content: string | null
   commentCount: number
   likeCount: number
+  likedByMe?: boolean
   createdAt: string
 }
 
@@ -57,6 +73,10 @@ export interface CommunityCommentListResponse {
 
 export interface CreateCommunityCommentRequest {
   content: string
+}
+
+export interface CreateCommunityPostRequest {
+  reviewId: number
 }
 
 export interface CreateCommunityCommentResponse {
@@ -88,9 +108,16 @@ export interface CommunityPostShareUrlResponse {
   shareUrl: string
 }
 
+export interface CommunityPostLikeResponse {
+  postId: number
+  liked: boolean
+  likeCount: number
+}
+
 export async function getCommunityPosts(params?: {
   keyword?: string
-  category?: string
+  regionName?: string
+  highlightType?: string
   sort?: string
   cursor?: string | null
   size?: number
@@ -107,6 +134,15 @@ export async function getRecommendedCommunityPosts(size = 6) {
   const response = await apiClient.get<BackendApiResponse<CommunityPostListResponse>>(
     '/api/v1/community/posts/recommendations',
     { params: { size } },
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function createCommunityPost(request: CreateCommunityPostRequest) {
+  const response = await apiClient.post<BackendApiResponse<CommunityPostDetailResponse>>(
+    '/api/v1/community/posts',
+    request,
   )
 
   return unwrapApiResponse(response.data)
@@ -167,6 +203,22 @@ export async function blockCommunityUser(userId: number) {
 export async function getCommunityPostShareUrl(postId: number) {
   const response = await apiClient.get<BackendApiResponse<CommunityPostShareUrlResponse>>(
     `/api/v1/community/posts/${postId}/share-url`,
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function likeCommunityPost(postId: number) {
+  const response = await apiClient.post<BackendApiResponse<CommunityPostLikeResponse>>(
+    `/api/v1/community/posts/${postId}/likes`,
+  )
+
+  return unwrapApiResponse(response.data)
+}
+
+export async function unlikeCommunityPost(postId: number) {
+  const response = await apiClient.delete<BackendApiResponse<CommunityPostLikeResponse>>(
+    `/api/v1/community/posts/${postId}/likes`,
   )
 
   return unwrapApiResponse(response.data)

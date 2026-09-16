@@ -49,23 +49,21 @@ function ReviewPage() {
     )
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (validCourseId == null) return
 
-    createReviewMutation.mutate(
-      {
+    try {
+      await createReviewMutation.mutateAsync({
         rating,
         comment: memo.trim() || null,
         recommendationScore,
         highlights,
-      },
-      {
-        onSuccess: () => {
-          navigate(ROUTE_PATHS.communityWithTab('mine'), { replace: true })
-        },
-      },
-    )
+      })
+      navigate(ROUTE_PATHS.communityWithTab('all'), { replace: true })
+    } catch {
+      // Error state is rendered below.
+    }
   }
 
   return (

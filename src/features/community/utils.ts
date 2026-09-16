@@ -1,7 +1,28 @@
-import { COMMUNITY_CATEGORY_LABELS } from './mock'
+import type { CommunityPostDetailResponse, CommunityPostSummaryResponse } from '../../api/community'
+
+const COMMUNITY_CATEGORY_LABELS: Record<string, string> = {
+  ALL: '전체',
+  FREE: '자유',
+  QUESTION: '질문',
+  REVIEW: '후기',
+  INFO: '정보',
+  TRAVEL_TIP: '후기',
+}
 
 export function getCommunityCategoryLabel(category: string) {
   return COMMUNITY_CATEGORY_LABELS[category] ?? category
+}
+
+export function getCommunityPostCategoryLabel(
+  post: Pick<CommunityPostSummaryResponse | CommunityPostDetailResponse, 'category'>,
+) {
+  return getCommunityCategoryLabel(post.category ?? 'REVIEW')
+}
+
+export function getCommunityPostTitle(
+  post: Pick<CommunityPostSummaryResponse | CommunityPostDetailResponse, 'title' | 'courseTitle'>,
+) {
+  return post.courseTitle ?? post.title ?? '여행 후기'
 }
 
 export function formatCommunityCount(count: number) {

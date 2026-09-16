@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
+import { resolveApiAssetUrl } from '../../../api/assetUrl'
 import type { CommunityPostSummaryResponse } from '../../../api/community'
 import { ROUTE_PATHS } from '../../../routes/routePaths'
 import { COMMUNITY_THUMBNAILS } from '../mock'
-import { formatCommunityCount, getCommunityCategoryLabel } from '../utils'
+import {
+  formatCommunityCount,
+  getCommunityPostCategoryLabel,
+  getCommunityPostTitle,
+} from '../utils'
 
 interface RecommendedPostCardProps {
   post: CommunityPostSummaryResponse
@@ -10,7 +15,9 @@ interface RecommendedPostCardProps {
 }
 
 function RecommendedPostCard({ post, rank }: RecommendedPostCardProps) {
-  const imageUrl = COMMUNITY_THUMBNAILS[(rank - 1) % COMMUNITY_THUMBNAILS.length]
+  const imageUrl =
+    resolveApiAssetUrl(post.courseImageUrl ?? null) ??
+    COMMUNITY_THUMBNAILS[(rank - 1) % COMMUNITY_THUMBNAILS.length]
 
   return (
     <Link
@@ -24,10 +31,10 @@ function RecommendedPostCard({ post, rank }: RecommendedPostCardProps) {
       </span>
       <div className="absolute inset-x-3 bottom-3">
         <span className="rounded-full bg-brand-lime px-2 py-0.5 text-[9px] font-black text-brand-blue">
-          {getCommunityCategoryLabel(post.category)}
+          {getCommunityPostCategoryLabel(post)}
         </span>
         <h3 className="mt-1 line-clamp-2 text-xs font-black leading-tight text-white">
-          {post.title}
+          {getCommunityPostTitle(post)}
         </h3>
         <p className="mt-1 text-[9px] font-semibold text-white/80">
           ♥ {formatCommunityCount(post.likeCount)}

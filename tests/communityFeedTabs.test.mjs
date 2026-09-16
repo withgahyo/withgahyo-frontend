@@ -6,11 +6,15 @@ import {
   getCommunityFeedSectionTitles,
 } from '../src/features/community/tabs.ts'
 import { ROUTE_PATHS } from '../src/routes/routePaths.ts'
+import {
+  getCommunityPostCategoryLabel,
+  getCommunityPostTitle,
+} from '../src/features/community/utils.ts'
 
-test('community feed uses three travel-review focused tabs', () => {
+test('community feed uses two travel-review focused tabs', () => {
   assert.deepEqual(
     COMMUNITY_FEED_TABS.map((tab) => tab.label),
-    ['추천', '전체', '내 후기'],
+    ['전체', '내 후기'],
   )
 })
 
@@ -26,7 +30,16 @@ test('community tab query resolves to mine when returning from my review routes'
   assert.equal(getCommunityFeedTabFromParam('mine'), 'mine')
 })
 
-test('invalid community tab query falls back to recommended', () => {
-  assert.equal(getCommunityFeedTabFromParam('unknown'), 'recommended')
-  assert.equal(getCommunityFeedTabFromParam(null), 'recommended')
+test('invalid community tab query falls back to all reviews', () => {
+  assert.equal(getCommunityFeedTabFromParam('unknown'), 'all')
+  assert.equal(getCommunityFeedTabFromParam(null), 'all')
+})
+
+test('community post display helpers read backend review fields', () => {
+  const post = {
+    courseTitle: '부산 효도여행 후기',
+  }
+
+  assert.equal(getCommunityPostTitle(post), '부산 효도여행 후기')
+  assert.equal(getCommunityPostCategoryLabel(post), '후기')
 })

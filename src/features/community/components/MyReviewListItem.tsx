@@ -12,6 +12,7 @@ interface MyReviewListItemProps {
 function MyReviewListItem({ review }: MyReviewListItemProps) {
   const imageUrl = resolveApiAssetUrl(review.course.imageUrl) ?? courseDaejeon
   const commentPreview = review.comment || '남긴 한줄 후기가 없어요.'
+  const previewHighlights = review.highlights.slice(0, 2)
 
   return (
     <Link
@@ -28,6 +29,18 @@ function MyReviewListItem({ review }: MyReviewListItemProps) {
           {review.course.title}
         </h3>
         <p className="mt-1 truncate text-[9px] font-semibold text-white/60">{commentPreview}</p>
+        {previewHighlights.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {previewHighlights.map((highlight) => (
+              <span
+                key={highlight}
+                className="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-bold text-white/85"
+              >
+                #{highlight}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </Link>
   )

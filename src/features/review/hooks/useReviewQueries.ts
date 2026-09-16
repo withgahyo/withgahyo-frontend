@@ -53,6 +53,7 @@ export function useCreateReview(courseId: number | null) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.pendingReviews })
       queryClient.invalidateQueries({ queryKey: queryKeys.myReviews })
+      queryClient.invalidateQueries({ queryKey: queryKeys.communityPostLists })
       if (courseId != null) {
         queryClient.invalidateQueries({ queryKey: queryKeys.myReview(courseId) })
       }

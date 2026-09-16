@@ -7,7 +7,7 @@ interface CommunityCategoryTabsProps {
 
 function CommunityCategoryTabs({ selectedTab, onSelect }: CommunityCategoryTabsProps) {
   return (
-    <div className="mt-4 grid grid-cols-3 gap-2 rounded-full bg-[#1b2ee9]/70 p-1.5 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08)]">
+    <div className="mt-4 grid grid-cols-2 gap-2 rounded-full bg-[#1b2ee9]/70 p-1.5 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.08)]">
       {COMMUNITY_FEED_TABS.map((tab) => {
         const isSelected = selectedTab === tab.value
 
