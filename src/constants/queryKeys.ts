@@ -2,6 +2,15 @@ export const queryKeys = {
   home: ['home'] as const,
 
   popular: ['popular'] as const,
+  communityPostLists: ['community', 'posts'] as const,
+  communityPosts: (params: object) => ['community', 'posts', params] as const,
+  communityRecommendations: (size: number) => ['community', 'recommendations', size] as const,
+  communityPost: (postId: number) => ['community', 'posts', postId] as const,
+  communityComments: (postId: number) => ['community', 'posts', postId, 'comments'] as const,
+  pendingReviews: ['reviews', 'pending'] as const,
+  myReviews: ['reviews', 'me'] as const,
+  reviewForm: (courseId: number) => ['reviews', 'form', courseId] as const,
+  myReview: (courseId: number) => ['reviews', 'me', courseId] as const,
 
   notifications: ['notifications'] as const,
 

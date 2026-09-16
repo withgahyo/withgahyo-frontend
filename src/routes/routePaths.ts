@@ -10,6 +10,8 @@ export const ROUTE_PATHS = {
   onboardingComplete: '/onboarding/complete',
 
   home: '/home',
+  community: '/community',
+  communityWithTab: (tab: string) => `/community?tab=${tab}`,
   popular: '/popular',
   albums: '/albums',
   mypage: '/mypage',
@@ -30,6 +32,9 @@ export const ROUTE_PATHS = {
   courseDetail: (courseId: string) => `/courses/${courseId}`,
 
   albumDetail: (albumId: string) => `/albums/${albumId}`,
+  communityPost: (postId: string | number) => `/community/${postId}`,
   notifications: '/notifications',
   review: (courseId: string) => `/reviews/${courseId}`,
+  myReviews: '/reviews/me',
+  myReviewDetail: (courseId: string | number) => `/reviews/me/${courseId}`,
 } as const

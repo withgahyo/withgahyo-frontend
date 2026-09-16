@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import {
+  type BackNavigationState,
+  getCourseBackDestination,
+} from '../../features/course/backNavigation'
 import CourseDetailSheet from '../../features/course/components/CourseDetailSheet'
 import CourseMap from '../../features/course/components/CourseMap'
 import { useCourseDetail } from '../../features/course/hooks/useCourseQueries'
@@ -20,7 +24,9 @@ function prefersReducedMotion() {
 
 function CourseDetailPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { courseId } = useParams<{ courseId: string }>()
+  const backTo = getCourseBackDestination((location.state as BackNavigationState | null)?.backTo)
 
   const numericCourseId = courseId ? Number(courseId) : null
   const {
@@ -38,7 +44,14 @@ function CourseDetailPage() {
 
   const bumpCamera = () => setCameraTick((tick) => tick + 1)
 
-  const handleBack = () => navigate(-1)
+  const handleBack = () => {
+    if (backTo) {
+      navigate(backTo, { replace: true })
+      return
+    }
+
+    navigate(-1)
+  }
 
   // TODO: 코스 찜하기 API 연동
   const handleWishlist = () => {}

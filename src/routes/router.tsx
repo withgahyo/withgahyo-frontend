@@ -14,6 +14,8 @@ import OnboardingConditionPage from '../pages/onboarding/OnboardingConditionPage
 import OnboardingCompletePage from '../pages/onboarding/OnboardingCompletePage'
 
 import HomePage from '../pages/home/HomePage'
+import CommunityPage from '../pages/community/CommunityPage'
+import CommunityDetailPage from '../pages/community/CommunityDetailPage'
 import PopularPage from '../pages/popular/PopularPage'
 import AlbumsPage from '../pages/albums/AlbumsPage'
 import AlbumDetailPage from '../pages/albums/AlbumDetailPage'
@@ -31,6 +33,8 @@ import CourseDetailPage from '../pages/course/CourseDetailPage'
 
 import NotificationPage from '../pages/notification/NotificationPage'
 import ReviewPage from '../pages/review/ReviewPage'
+import MyReviewDetailPage from '../pages/review/MyReviewDetailPage'
+import MyReviewsPage from '../pages/review/MyReviewsPage'
 import NotFoundPage from '../pages/not-found/NotFoundPage'
 
 import AuthGuard from './AuthGuard'
@@ -62,6 +66,7 @@ export const router = createBrowserRouter([
             element: <MainTabLayout />,
             children: [
               { path: ROUTE_PATHS.home, element: <HomePage /> },
+              { path: ROUTE_PATHS.community, element: <CommunityPage /> },
               { path: ROUTE_PATHS.popular, element: <PopularPage /> },
               { path: ROUTE_PATHS.albums, element: <AlbumsPage /> },
               { path: ROUTE_PATHS.mypage, element: <MyPage /> },
@@ -113,10 +118,13 @@ export const router = createBrowserRouter([
 
               { path: '/albums/:albumId', element: <AlbumDetailPage /> },
               { path: ROUTE_PATHS.notifications, element: <NotificationPage /> },
+              { path: '/community/:postId', element: <CommunityDetailPage /> },
               { path: ROUTE_PATHS.mypageProfile, element: <ProfileEditPage /> },
               { path: ROUTE_PATHS.mypagePreferences, element: <TravelPreferenceEditPage /> },
               { path: ROUTE_PATHS.support, element: <SupportChatPage /> },
               { path: ROUTE_PATHS.terms, element: <TermsPage /> },
+              { path: ROUTE_PATHS.myReviews, element: <MyReviewsPage /> },
+              { path: '/reviews/me/:courseId', element: <MyReviewDetailPage /> },
               { path: '/reviews/:courseId', element: <ReviewPage /> },
             ],
           },

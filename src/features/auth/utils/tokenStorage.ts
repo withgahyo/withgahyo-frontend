@@ -59,7 +59,14 @@ export function getStoredAuthUser(): AuthUser | null {
   }
 
   try {
-    return JSON.parse(storedUser) as AuthUser
+    const parsedUser = JSON.parse(storedUser) as AuthUser
+    const normalizedUser = normalizeAuthUser(parsedUser)
+
+    if (normalizedUser.profileImageUrl !== parsedUser.profileImageUrl) {
+      setAuthUser(normalizedUser)
+    }
+
+    return normalizedUser
   } catch {
     window.localStorage.removeItem(AUTH_USER_KEY)
     return null
@@ -84,7 +91,26 @@ export function setAuthUser(user: AuthUser) {
     return
   }
 
-  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))
+  window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizeAuthUser(user)))
+}
+
+export function normalizeAuthUser(user: AuthUser, assetBaseUrl = getDefaultAssetBaseUrl()): AuthUser {
+  return {
+    ...user,
+    profileImageUrl: resolveAuthProfileImageUrl(user.profileImageUrl, assetBaseUrl),
+  }
+}
+
+function resolveAuthProfileImageUrl(url: string | null | undefined, assetBaseUrl: string) {
+  if (!url || !url.startsWith('/') || !assetBaseUrl) {
+    return url
+  }
+
+  return new URL(url, assetBaseUrl).toString()
+}
+
+function getDefaultAssetBaseUrl() {
+  return import.meta.env?.VITE_API_BASE_URL ?? ''
 }
 
 /**
