@@ -1,13 +1,18 @@
 import { ChevronLeft } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import CommunityBackgroundLoop from '../../features/community/components/CommunityBackgroundLoop'
 import CommunityStateNotice from '../../features/community/components/CommunityStateNotice'
+import {
+  type BackNavigationState,
+  getReviewDetailBackDestination,
+} from '../../features/course/backNavigation'
 import MyReviewArticle from '../../features/review/components/MyReviewArticle'
 import { useMyReview, useReviewForm } from '../../features/review/hooks/useReviewQueries'
-import { ROUTE_PATHS } from '../../routes/routePaths'
 
 function MyReviewDetailPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const backTo = getReviewDetailBackDestination(location.state as BackNavigationState | null)
   const { courseId = '0' } = useParams()
   const numericCourseId = Number(courseId)
   const validCourseId =
@@ -24,7 +29,7 @@ function MyReviewDetailPage() {
       <header className="relative z-1 flex h-16 items-center px-5">
         <button
           type="button"
-          onClick={() => navigate(ROUTE_PATHS.myReviews)}
+          onClick={() => navigate(backTo)}
           className="flex items-center gap-1 text-brand-lime"
           aria-label="뒤로가기"
         >
@@ -49,6 +54,7 @@ function MyReviewDetailPage() {
             review={review}
             course={reviewForm.course}
             recommendationMax={reviewForm.recommendationMax}
+            courseBackTo={backTo}
           />
         )}
       </main>

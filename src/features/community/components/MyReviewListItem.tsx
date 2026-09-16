@@ -7,9 +7,10 @@ import { ROUTE_PATHS } from '../../../routes/routePaths'
 
 interface MyReviewListItemProps {
   review: MyReviewItemResponse
+  detailBackTo?: string
 }
 
-function MyReviewListItem({ review }: MyReviewListItemProps) {
+function MyReviewListItem({ review, detailBackTo }: MyReviewListItemProps) {
   const imageUrl = resolveApiAssetUrl(review.course.imageUrl) ?? courseDaejeon
   const commentPreview = review.comment || '남긴 한줄 후기가 없어요.'
   const previewHighlights = review.highlights.slice(0, 2)
@@ -17,6 +18,7 @@ function MyReviewListItem({ review }: MyReviewListItemProps) {
   return (
     <Link
       to={ROUTE_PATHS.myReviewDetail(review.course.courseId)}
+      state={detailBackTo ? { backTo: detailBackTo } : undefined}
       className="flex min-h-20 items-center rounded-xl bg-[#071ed8] p-2.5 shadow-[0_8px_18px_rgb(0_0_0/0.18)]"
     >
       <img src={imageUrl} alt="" className="h-14 w-14 shrink-0 rounded-md object-cover" />

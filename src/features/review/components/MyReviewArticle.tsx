@@ -9,9 +9,15 @@ interface MyReviewArticleProps {
   review: ReviewResponse
   course: PendingReviewItemResponse
   recommendationMax: number
+  courseBackTo?: string
 }
 
-function MyReviewArticle({ review, course, recommendationMax }: MyReviewArticleProps) {
+function MyReviewArticle({
+  review,
+  course,
+  recommendationMax,
+  courseBackTo,
+}: MyReviewArticleProps) {
   const imageUrl = resolveApiAssetUrl(course.imageUrl) ?? courseDaejeon
   const recommendationRate =
     recommendationMax > 0 ? Math.min(100, (review.recommendationScore / recommendationMax) * 100) : 0
@@ -26,6 +32,7 @@ function MyReviewArticle({ review, course, recommendationMax }: MyReviewArticleP
         </div>
         <Link
           to={ROUTE_PATHS.courseDetail(String(course.courseId))}
+          state={courseBackTo ? { backTo: courseBackTo } : undefined}
           className="shrink-0 rounded-full bg-brand-lime px-3 py-1.5 text-[10px] font-black text-brand-blue"
         >
           코스 보기

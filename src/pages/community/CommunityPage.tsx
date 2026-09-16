@@ -19,6 +19,9 @@ import {
   type CommunityFeedTab,
 } from '../../features/community/tabs'
 import {
+  MY_REVIEW_FEED_BACK_TO,
+} from '../../features/course/backNavigation'
+import {
   ALL_COMMUNITY_REGIONS,
   buildCommunityPostParams,
   getCommunityRegionFilterLabel,
@@ -166,7 +169,11 @@ function MyReviewSection() {
             />
           )}
           {previewMyReviews.map((review) => (
-            <MyReviewListItem key={review.reviewId} review={review} />
+            <MyReviewListItem
+              key={review.reviewId}
+              review={review}
+              detailBackTo={MY_REVIEW_FEED_BACK_TO}
+            />
           ))}
         </div>
       </section>
