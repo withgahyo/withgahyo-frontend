@@ -38,11 +38,6 @@ function CommunitySearchBar({
           <SlidersHorizontal aria-hidden="true" size={18} />
         </button>
       </label>
-      {isFilterActive && (
-        <div className="mt-2 inline-flex rounded-full bg-white/14 px-3 py-1 text-[11px] font-extrabold text-brand-lime">
-          {selectedRegionLabel}
-        </div>
-      )}
     </div>
   )
 }
