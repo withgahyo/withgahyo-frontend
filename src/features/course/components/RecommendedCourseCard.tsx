@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTE_PATHS } from '../../../routes/routePaths'
+import { getCourseFallbackImage } from '../utils/courseFallbackImage'
 import type { CourseCandidateSummary } from '../types'
 
 interface RecommendedCourseCardProps {
   candidate: CourseCandidateSummary
+  /** 후보 순위(1-base). fallback 이미지를 후보마다 다르게 배정하는 기준. */
+  rank: number
   courseId: string
   generationId: string
   onSelect: (candidateId: number) => void
@@ -15,6 +19,7 @@ interface RecommendedCourseCardProps {
 
 function RecommendedCourseCard({
   candidate,
+  rank,
   courseId,
   generationId,
   onSelect,
@@ -25,17 +30,23 @@ function RecommendedCourseCard({
   const { candidateId, title, summary, matchScore, tags, thumbnailImageUrl } = candidate
   const isLocked = disabled || isSelecting
 
+  // 실제 썸네일 로딩이 실패해도(네트워크 오류 등) fallback으로 바꾼다.
+  // fallback(로컬 정적 asset) 자체는 실패할 일이 없으므로 무한 onError 루프는 발생하지 않는다.
+  const [thumbnailFailed, setThumbnailFailed] = useState(false)
+  const fallbackImage = getCourseFallbackImage(rank)
+  const displayImageSrc =
+    thumbnailImageUrl && !thumbnailFailed ? thumbnailImageUrl : fallbackImage
+
   return (
     <article className="rounded-card border border-gray-100 bg-white p-4 shadow-[0_2px_16px_-8px_rgba(20,20,43,0.15)]">
       <div className="flex gap-3">
         <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-200">
-          {thumbnailImageUrl ? (
-            <img
-              src={thumbnailImageUrl}
-              alt={`${title} 대표 이미지`}
-              className="h-full w-full object-cover"
-            />
-          ) : null}
+          <img
+            src={displayImageSrc}
+            alt={`${title} 대표 이미지`}
+            className="h-full w-full object-cover"
+            onError={() => setThumbnailFailed(true)}
+          />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">

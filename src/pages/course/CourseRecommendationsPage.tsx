@@ -150,9 +150,10 @@ function CourseRecommendationsPage() {
                 </p>
               )}
 
-              {candidates.map((candidate) => (
+              {candidates.map((candidate, index) => (
                 <RecommendedCourseCard
                   key={candidate.candidateId}
+                  rank={index + 1}
                   candidate={{
                     candidateId: candidate.candidateId,
                     title: candidate.title,
