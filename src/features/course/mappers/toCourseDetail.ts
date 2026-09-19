@@ -1,3 +1,4 @@
+import { resolveApiAssetUrl } from '../../../api/assetUrl'
 import type { CourseDetailResponse } from '../../../api/course'
 import type { CourseDetail, CoursePlace, TravelMode } from '../types'
 
@@ -8,6 +9,8 @@ interface FlattenablePlace {
   order: number
   name: string
   category: string
+  address: string | null
+  imageUrl: string | null
   latitude: number
   longitude: number
   transportToNext: {
@@ -45,6 +48,9 @@ export function daysToCoursePlaces(days: FlattenableDay[]): CoursePlace[] {
       day,
       name: place.name,
       category: place.category,
+      address: place.address ?? undefined,
+      // TourAPI/Kakao 등 외부 절대 URL은 그대로 통과하고, 자체 서버 상대 경로만 변환한다.
+      imageUrl: resolveApiAssetUrl(place.imageUrl) ?? undefined,
       latitude: place.latitude,
       longitude: place.longitude,
       travelTimeFromPrevious: previous?.transportToNext.durationMinutes ?? undefined,

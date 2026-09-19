@@ -53,11 +53,6 @@ function CourseDetailPage() {
     navigate(-1)
   }
 
-  // TODO: 코스 찜하기 API 연동
-  const handleWishlist = () => {}
-  // TODO: 코스 확정 API 연동
-  const handleConfirm = () => {}
-
   const changeSheetState = (next: SheetState) => {
     if (sheetState === next) return
     setSheetState(next)
@@ -134,8 +129,7 @@ function CourseDetailPage() {
             onSheetStateChange={changeSheetState}
             onPlaceSelect={handlePlaceSelect}
             onSheetTransitionEnd={bumpCamera}
-            onWishlist={handleWishlist}
-            onConfirm={handleConfirm}
+            hideActions
           />
         </>
       )}

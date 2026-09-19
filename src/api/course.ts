@@ -257,6 +257,8 @@ export interface CourseDetailPlaceResponse {
   placeId: number
   name: string
   category: string
+  address: string | null
+  imageUrl: string | null
   arrivalTime: string | null
   departureTime: string | null
   latitude: number

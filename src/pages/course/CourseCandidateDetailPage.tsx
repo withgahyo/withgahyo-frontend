@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmLeaveModal from '../../components/common/ConfirmLeaveModal'
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning'
+import type { BackNavigationState } from '../../features/course/backNavigation'
 import CourseDetailSheet from '../../features/course/components/CourseDetailSheet'
 import CourseMap from '../../features/course/components/CourseMap'
 import { useGenerationExitBlocker } from '../../features/course/hooks/useGenerationExitBlocker'
@@ -91,7 +92,10 @@ function CourseCandidateDetailPage() {
     selectMutation.mutate(numericCandidateId as number, {
       onSuccess: (data) => {
         allowNextNavigation()
-        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
+        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), {
+          replace: true,
+          state: { backTo: ROUTE_PATHS.home } satisfies BackNavigationState,
+        })
       },
     })
   }

@@ -14,14 +14,16 @@ interface CourseDetailSheetProps {
   onSheetStateChange: (next: SheetState) => void
   onPlaceSelect: (id: number) => void
   onSheetTransitionEnd: () => void
-  onWishlist: () => void
-  onConfirm: () => void
+  onWishlist?: () => void
+  onConfirm?: () => void
   /** 확정 버튼 라벨. 기본값 '코스 확정하기' (후보 상세에서는 '이 코스로 확정' 등으로 덮어쓴다) */
   confirmLabel?: string
   /** 확정 요청 중이면 버튼을 잠근다 */
   isConfirmPending?: boolean
   /** 찜하기 버튼 숨김 (후보 상세 등 찜 개념이 없는 화면) */
   hideWishlist?: boolean
+  /** 찜하기/확정 CTA 영역 전체를 숨김 (이미 확정된 최종 코스 상세) */
+  hideActions?: boolean
 }
 
 function CourseDetailSheet({
@@ -38,6 +40,7 @@ function CourseDetailSheet({
   confirmLabel = '코스 확정하기',
   isConfirmPending = false,
   hideWishlist = false,
+  hideActions = false,
 }: CourseDetailSheetProps) {
   const sortedPlaces = [...places].sort((a, b) => a.order - b.order)
   const selectedPlace = sortedPlaces.find((place) => place.id === selectedPlaceId) ?? null
@@ -150,32 +153,34 @@ function CourseDetailSheet({
         })}
       </ol>
 
-      {/* CTA — expanded에서만 노출, 목록을 스크롤해도 하단 고정 */}
-      <div className="flex shrink-0 gap-2 border-t border-gray-100 px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] group-data-[state=collapsed]/sheet:hidden">
-        {!hideWishlist && (
+      {/* CTA — expanded에서만 노출, 목록을 스크롤해도 하단 고정. 이미 확정된 코스는 hideActions로 전체 숨김 */}
+      {!hideActions && (
+        <div className="flex shrink-0 gap-2 border-t border-gray-100 px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] group-data-[state=collapsed]/sheet:hidden">
+          {!hideWishlist && (
+            <button
+              type="button"
+              onClick={onWishlist}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-lime py-3.5 text-sm font-semibold text-brand-blue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+            >
+              <Heart aria-hidden="true" size={16} strokeWidth={2.5} />
+              코스 찜하기
+            </button>
+          )}
           <button
             type="button"
-            onClick={onWishlist}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-brand-lime py-3.5 text-sm font-semibold text-brand-blue transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue"
+            onClick={onConfirm}
+            disabled={isConfirmPending}
+            aria-disabled={isConfirmPending}
+            className={`flex-1 rounded-full py-3.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
+              isConfirmPending
+                ? 'cursor-not-allowed bg-gray-200 text-gray-400'
+                : 'bg-brand-blue text-brand-lime'
+            }`}
           >
-            <Heart aria-hidden="true" size={16} strokeWidth={2.5} />
-            코스 찜하기
+            {confirmLabel}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={isConfirmPending}
-          aria-disabled={isConfirmPending}
-          className={`flex-1 rounded-full py-3.5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue ${
-            isConfirmPending
-              ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-              : 'bg-brand-blue text-brand-lime'
-          }`}
-        >
-          {confirmLabel}
-        </button>
-      </div>
+        </div>
+      )}
     </section>
   )
 }
