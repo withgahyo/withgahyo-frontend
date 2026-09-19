@@ -1,3 +1,10 @@
+export interface AlternativeCourse {
+  id: string
+  title: string
+  summary: string
+  imageUrl: string | null
+}
+
 export interface FamilyCourse {
   id: string
   title: string
@@ -6,11 +13,6 @@ export interface FamilyCourse {
   dDay?: string
   date?: string
   tags: string[]
-}
-
-export interface FavoriteCourse {
-  id: string
-  title: string
-  region: string
-  imageUrl: string | null
+  alternativeCandidates: AlternativeCourse[]
+  isPastTrip: boolean
 }

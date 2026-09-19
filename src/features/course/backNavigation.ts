@@ -15,3 +15,9 @@ export function getReviewDetailBackDestination(
 ) {
   return getCourseBackDestination(state?.backTo) ?? ROUTE_PATHS.myReviews
 }
+
+export function getReviewFormBackDestination(
+  state: BackNavigationState | null | undefined,
+) {
+  return getCourseBackDestination(state?.backTo) ?? ROUTE_PATHS.communityWithTab('mine')
+}

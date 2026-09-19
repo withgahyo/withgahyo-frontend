@@ -1,6 +1,7 @@
 import { Forward } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ROUTE_PATHS } from '../../../routes/routePaths'
+import { useCourseImageFallback } from '../hooks/useCourseImageFallback'
 import type { FamilyCourse } from '../types'
 
 interface FamilyCourseCardProps {
@@ -9,6 +10,14 @@ interface FamilyCourseCardProps {
 }
 
 function FamilyCourseCard({ course, active }: FamilyCourseCardProps) {
+  // courseId(=course.id)를 seed로 써서 같은 코스는 항상 같은 공통 fallback 이미지가 나오게 한다.
+  const seed = Number(course.id) || 0
+  const { src: displayImageSrc, onError: handleImageError } = useCourseImageFallback(
+    course.imageUrl,
+    course.region,
+    seed,
+  )
+
   return (
     <Link
       to={ROUTE_PATHS.courseDetail(course.id)}
@@ -19,11 +28,12 @@ function FamilyCourseCard({ course, active }: FamilyCourseCardProps) {
         active ? '' : 'pointer-events-none'
       }`}
     >
-      {course.imageUrl ? (
-        <img src={course.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <div className="absolute inset-0 bg-linear-to-br from-brand-blue/40 to-ink/60" />
-      )}
+      <img
+        src={displayImageSrc}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        onError={handleImageError}
+      />
 
       {/* 실제 사진 위에서도 텍스트 대비가 유지되도록 상/하단에 은은한 vignette를 깐다 */}
       <div className="absolute inset-0 bg-linear-to-b from-black/40 via-transparent to-black/50" />
