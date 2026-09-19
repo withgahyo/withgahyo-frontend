@@ -1,7 +1,9 @@
 import type { KeyboardEvent } from 'react'
+import { useState } from 'react'
 import { Car, Clock, ExternalLink } from 'lucide-react'
 import PlaceCategoryIcon from './PlaceCategoryIcon'
 import { buildKakaoMapPlaceUrl } from '../utils/kakaoMapLink'
+import { getPlaceCategoryLabel } from '../utils/placeCategoryLabel'
 import type { CoursePlace } from '../types'
 
 interface CoursePlaceItemProps {
@@ -17,6 +19,13 @@ function CoursePlaceItem({ place, isFirst, isLast, isSelected, onSelect }: Cours
     !isFirst && place.travelTimeFromPrevious
       ? `약 ${place.travelTimeFromPrevious}분 소요`
       : null
+
+  // 이미지 요청 자체가 실패한 경우(깨진 링크 등)에도 카테고리 아이콘 fallback을 보여준다.
+  const [imageLoadFailed, setImageLoadFailed] = useState(false)
+  const showImage = Boolean(place.imageUrl) && !imageLoadFailed
+
+  const categoryLabel = getPlaceCategoryLabel(place.category)
+  const placeInfoText = [categoryLabel, place.address].filter(Boolean).join(' · ')
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -73,8 +82,8 @@ function CoursePlaceItem({ place, isFirst, isLast, isSelected, onSelect }: Cours
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="text-base font-bold text-ink">{place.name}</h3>
-                {place.address && (
-                  <p className="mt-0.5 text-caption text-gray-500">{place.address}</p>
+                {placeInfoText && (
+                  <p className="mt-0.5 text-caption text-gray-500">{placeInfoText}</p>
                 )}
                 {place.openingHours && (
                   <p className="mt-2 flex items-center gap-1 text-caption text-gray-400">
@@ -88,11 +97,12 @@ function CoursePlaceItem({ place, isFirst, isLast, isSelected, onSelect }: Cours
               </div>
 
               <div className="h-18 w-18 shrink-0 overflow-hidden rounded-2xl bg-gray-100">
-                {place.imageUrl ? (
+                {showImage ? (
                   <img
                     src={place.imageUrl}
                     alt={`${place.name} 사진`}
                     className="h-full w-full object-cover"
+                    onError={() => setImageLoadFailed(true)}
                   />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center">

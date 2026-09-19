@@ -101,6 +101,8 @@ export interface CourseCandidatePlaceResponse {
   source: string | null
   name: string
   category: string
+  address: string | null
+  imageUrl: string | null
   arrivalTime: string | null
   departureTime: string | null
   latitude: number
