@@ -14,4 +14,5 @@ export interface FamilyCourse {
   date?: string
   tags: string[]
   alternativeCandidates: AlternativeCourse[]
+  isPastTrip: boolean
 }

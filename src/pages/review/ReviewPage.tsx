@@ -1,8 +1,12 @@
 import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import PrimaryButton from '../../components/common/PrimaryButton'
 import vectorDecoration from '../../assets/splash/Vector.svg'
+import {
+  type BackNavigationState,
+  getReviewFormBackDestination,
+} from '../../features/course/backNavigation'
 import ReviewCourseSummaryCard from '../../features/review/components/ReviewCourseSummaryCard'
 import ReviewHighlightField from '../../features/review/components/ReviewHighlightField'
 import ReviewMemoField from '../../features/review/components/ReviewMemoField'
@@ -14,6 +18,8 @@ import { ROUTE_PATHS } from '../../routes/routePaths'
 
 function ReviewPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const backTo = getReviewFormBackDestination(location.state as BackNavigationState | null)
   const { courseId = '0' } = useParams()
   const numericCourseId = Number(courseId)
   const validCourseId =
@@ -78,7 +84,7 @@ function ReviewPage() {
       <header className="relative z-1 flex h-18 items-center px-5">
         <button
           type="button"
-          onClick={() => navigate(ROUTE_PATHS.communityWithTab('mine'))}
+          onClick={() => navigate(backTo)}
           className="flex items-center gap-1 text-brand-lime"
           aria-label="뒤로가기"
         >

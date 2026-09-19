@@ -2,6 +2,7 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import AlternativeCandidateList from './AlternativeCandidateList'
 import CreateCourseCard from './CreateCourseCard'
 import FamilyCourseCard from './FamilyCourseCard'
+import ReviewWriteButton from './ReviewWriteButton'
 import type { FamilyCourse } from '../types'
 
 interface FamilyCourseCarouselProps {
@@ -126,6 +127,8 @@ function FamilyCourseCarousel({ courses }: FamilyCourseCarouselProps) {
           />
         ))}
       </div>
+
+      {activeCourse?.isPastTrip && <ReviewWriteButton courseId={activeCourse.id} />}
 
       {activeCourse && (
         <AlternativeCandidateList

@@ -37,6 +37,7 @@ export function toFamilyCourse(course: HomeCourseResponse): FamilyCourse {
     date: formatCourseDate(course.startDate),
     tags: course.tags,
     alternativeCandidates: course.alternativeCandidates.map(toAlternativeCourse),
+    isPastTrip: course.daysUntilTrip < 0,
   }
 }
 

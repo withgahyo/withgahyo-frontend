@@ -7,6 +7,7 @@ import {
   toAlternativeCourse,
 } from '../src/features/home/mappers/toFamilyCourse.ts'
 import { sortFamilyCoursesForHome } from '../src/features/home/utils/sortFamilyCourses.ts'
+import { ROUTE_PATHS } from '../src/routes/routePaths.ts'
 
 test('formats a positive days-until-trip as D-<n>', () => {
   assert.equal(formatDDay(5), 'D-5')
@@ -47,6 +48,7 @@ test('maps a home course response to the family course view model', () => {
     date: '9월 25일 (금)',
     tags: ['문화', '맛집'],
     alternativeCandidates: [],
+    isPastTrip: false,
   })
 })
 
@@ -106,6 +108,57 @@ test('maps a family course carrying multiple alternative candidates, preserving 
     course.alternativeCandidates.map((candidate) => candidate.id),
     ['101', '103'],
   )
+})
+
+test('marks a future trip as not past', () => {
+  const course = toFamilyCourse({
+    courseId: 1,
+    title: 't',
+    regionName: '대전',
+    imageUrl: null,
+    startDate: '2026-09-25',
+    daysUntilTrip: 5,
+    tags: [],
+    alternativeCandidates: [],
+  })
+
+  assert.equal(course.isPastTrip, false)
+})
+
+test('marks a today trip as not past', () => {
+  const course = toFamilyCourse({
+    courseId: 1,
+    title: 't',
+    regionName: '대전',
+    imageUrl: null,
+    startDate: '2026-09-25',
+    daysUntilTrip: 0,
+    tags: [],
+    alternativeCandidates: [],
+  })
+
+  assert.equal(course.isPastTrip, false)
+})
+
+test('marks a past trip (negative daysUntilTrip) as past', () => {
+  const course = toFamilyCourse({
+    courseId: 1,
+    title: 't',
+    regionName: '대전',
+    imageUrl: null,
+    startDate: '2026-09-07',
+    daysUntilTrip: -13,
+    tags: [],
+    alternativeCandidates: [],
+  })
+
+  assert.equal(course.isPastTrip, true)
+  // dDay 문자열이 아니라 원본 daysUntilTrip에서 계산된 값임을 함께 확인한다.
+  assert.equal(course.dDay, 'D+13')
+})
+
+test('resolves the review write route from a course id', () => {
+  assert.equal(ROUTE_PATHS.review('9108'), '/reviews/9108')
 })
 
 function stubCourse(courseId, daysUntilTrip) {
