@@ -1,4 +1,5 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import AlternativeCandidateList from './AlternativeCandidateList'
 import CreateCourseCard from './CreateCourseCard'
 import FamilyCourseCard from './FamilyCourseCard'
 import type { FamilyCourse } from '../types'
@@ -35,6 +36,9 @@ function FamilyCourseCarousel({ courses }: FamilyCourseCarouselProps) {
   const pointerStartX = useRef<number | null>(null)
   const pointerDeltaX = useRef(0)
   const isDragCaptured = useRef(false)
+
+  const activeItem = items[activeIndex]
+  const activeCourse = activeItem.type === 'course' ? activeItem.course : null
 
   const goTo = (nextIndex: number) => {
     setActiveIndex(((nextIndex % total) + total) % total)
@@ -122,6 +126,13 @@ function FamilyCourseCarousel({ courses }: FamilyCourseCarouselProps) {
           />
         ))}
       </div>
+
+      {activeCourse && (
+        <AlternativeCandidateList
+          candidates={activeCourse.alternativeCandidates}
+          region={activeCourse.region}
+        />
+      )}
     </div>
   )
 }

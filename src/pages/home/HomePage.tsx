@@ -1,9 +1,15 @@
 import HomeHeader from '../../features/home/components/HomeHeader'
 import HomeBanner from '../../features/home/components/HomeBanner'
 import FamilyCourseSection from '../../features/home/components/FamilyCourseSection'
-import FavoriteCourseSection from '../../features/home/components/FavoriteCourseSection'
+import { useHomeFamilyCourses } from '../../features/home/hooks/useHomeQueries'
 
 function HomePage() {
+  const {
+    data: familyCourses,
+    isLoading: isFamilyCoursesLoading,
+    isError: isFamilyCoursesError,
+  } = useHomeFamilyCourses()
+
   return (
     // AppContainer의 Safe Area(top) padding 안까지 Blue 배경이 이어지도록
     // 노치/Dynamic Island 영역까지 배경을 확장한다 (Splash/OnboardingComplete와 동일한 패턴).
@@ -17,8 +23,11 @@ function HomePage() {
         <HomeBanner />
       </div>
 
-      <FamilyCourseSection />
-      <FavoriteCourseSection />
+      <FamilyCourseSection
+        courses={familyCourses}
+        isLoading={isFamilyCoursesLoading}
+        isError={isFamilyCoursesError}
+      />
     </div>
   )
 }
