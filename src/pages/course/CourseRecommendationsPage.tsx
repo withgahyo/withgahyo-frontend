@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { ChevronLeft, Pencil, RefreshCw } from 'lucide-react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import vectorDecoration from '../../assets/splash/Vector.svg'
 import ConfirmLeaveModal from '../../components/common/ConfirmLeaveModal'
 import { useBeforeUnloadWarning } from '../../hooks/useBeforeUnloadWarning'
+import type { BackNavigationState } from '../../features/course/backNavigation'
 import RecommendedCourseCard from '../../features/course/components/RecommendedCourseCard'
 import { useGenerationExitBlocker } from '../../features/course/hooks/useGenerationExitBlocker'
 import {
@@ -30,18 +32,38 @@ function CourseRecommendationsPage() {
   const selectMutation = useSelectCourseCandidate(hasValidParams ? numericGenerationId : null)
 
   const candidates = candidatesQuery.data?.candidates ?? []
+  // 이미 이 generation의 후보가 확정된 상태인지 (직접 확정 후 브라우저 Back으로 재진입한 경우 포함).
+  const alreadySelectedCourseId = candidatesQuery.data?.selectedCandidateId != null
+    ? candidatesQuery.data.courseId
+    : null
+  const isAlreadyConfirmed = alreadySelectedCourseId != null
 
-  // 후보를 아직 확정하지 않은 동안에는 flow 밖으로 나가는 이동을 막는다.
-  const isUnconfirmed = hasValidParams
+  // 후보를 아직 확정하지 않은 동안에만 flow 밖으로 나가는 이동을 막는다.
+  // 이미 확정된 generation 이면 더 이상 막지 않는다.
+  const isUnconfirmed = hasValidParams && !isAlreadyConfirmed
   const { blocker, allowNextNavigation } = useGenerationExitBlocker(isUnconfirmed)
   useBeforeUnloadWarning(isUnconfirmed)
+
+  // 브라우저 Back 등으로 이미 확정된 generation의 후보 목록에 재진입하면, 후보 목록을 그리지 않고
+  // 곧바로 확정된 코스 상세로 되돌린다. (로딩 완료 → selectedCandidateId 확인 → redirect 순서)
+  useEffect(() => {
+    if (alreadySelectedCourseId == null) return
+    allowNextNavigation()
+    navigate(ROUTE_PATHS.courseDetail(String(alreadySelectedCourseId)), {
+      replace: true,
+      state: { backTo: ROUTE_PATHS.home } satisfies BackNavigationState,
+    })
+  }, [alreadySelectedCourseId, navigate, allowNextNavigation])
 
   const handleSelect = (candidateId: number) => {
     if (selectMutation.isPending) return
     selectMutation.mutate(candidateId, {
       onSuccess: (data) => {
         allowNextNavigation()
-        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), { replace: true })
+        navigate(ROUTE_PATHS.courseDetail(String(data.courseId)), {
+          replace: true,
+          state: { backTo: ROUTE_PATHS.home } satisfies BackNavigationState,
+        })
       },
     })
   }
@@ -127,6 +149,10 @@ function CourseRecommendationsPage() {
           ) : candidatesQuery.isLoading ? (
             <p className="py-10 text-center text-caption text-gray-400">
               추천 코스를 불러오는 중...
+            </p>
+          ) : isAlreadyConfirmed ? (
+            <p className="py-10 text-center text-caption text-gray-400">
+              이미 확정된 코스로 이동하는 중...
             </p>
           ) : candidates.length === 0 ? (
             <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
