@@ -4,7 +4,9 @@ import type { AlternativeCourse, FamilyCourse } from '../types'
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export function formatDDay(daysUntilTrip: number): string {
-  return daysUntilTrip <= 0 ? 'D-Day' : `D-${daysUntilTrip}`
+  if (daysUntilTrip > 0) return `D-${daysUntilTrip}`
+  if (daysUntilTrip === 0) return 'D-Day'
+  return `D+${Math.abs(daysUntilTrip)}`
 }
 
 // "YYYY-MM-DD"를 직접 split해 연/월/일을 로컬 타임존으로 조립한다.

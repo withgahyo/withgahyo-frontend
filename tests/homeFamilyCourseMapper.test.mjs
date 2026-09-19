@@ -6,17 +6,20 @@ import {
   toFamilyCourse,
   toAlternativeCourse,
 } from '../src/features/home/mappers/toFamilyCourse.ts'
+import { sortFamilyCoursesForHome } from '../src/features/home/utils/sortFamilyCourses.ts'
 
 test('formats a positive days-until-trip as D-<n>', () => {
-  assert.equal(formatDDay(6), 'D-6')
+  assert.equal(formatDDay(5), 'D-5')
+  assert.equal(formatDDay(1), 'D-1')
 })
 
 test('formats zero days-until-trip as D-Day', () => {
   assert.equal(formatDDay(0), 'D-Day')
 })
 
-test('clamps a negative days-until-trip safely to D-Day', () => {
-  assert.equal(formatDDay(-3), 'D-Day')
+test('formats a negative days-until-trip as D+<n> instead of clamping to D-Day', () => {
+  assert.equal(formatDDay(-1), 'D+1')
+  assert.equal(formatDDay(-10), 'D+10')
 })
 
 test('formats a date-only string as month/day/weekday without shifting a day', () => {
@@ -103,4 +106,91 @@ test('maps a family course carrying multiple alternative candidates, preserving 
     course.alternativeCandidates.map((candidate) => candidate.id),
     ['101', '103'],
   )
+})
+
+function stubCourse(courseId, daysUntilTrip) {
+  return {
+    courseId,
+    title: `course-${courseId}`,
+    regionName: '대전',
+    imageUrl: null,
+    startDate: '2026-09-25',
+    daysUntilTrip,
+    tags: [],
+    alternativeCandidates: [{ candidateId: courseId * 100, title: 't', summary: 's', thumbnailImageUrl: null }],
+  }
+}
+
+test('sorts multiple upcoming trips by nearest date first', () => {
+  const courses = [stubCourse(1, 30), stubCourse(2, 2), stubCourse(3, 10)]
+
+  assert.deepEqual(
+    sortFamilyCoursesForHome(courses).map((c) => c.daysUntilTrip),
+    [2, 10, 30],
+  )
+})
+
+test('places a today trip before future trips', () => {
+  const courses = [stubCourse(1, 5), stubCourse(2, 0)]
+
+  assert.deepEqual(
+    sortFamilyCoursesForHome(courses).map((c) => c.daysUntilTrip),
+    [0, 5],
+  )
+})
+
+test('places past trips after every today/upcoming trip', () => {
+  const courses = [stubCourse(1, -3), stubCourse(2, 5)]
+
+  assert.deepEqual(
+    sortFamilyCoursesForHome(courses).map((c) => c.daysUntilTrip),
+    [5, -3],
+  )
+})
+
+test('sorts multiple past trips by most recently taken first', () => {
+  const courses = [stubCourse(1, -30), stubCourse(2, -1), stubCourse(3, -7)]
+
+  assert.deepEqual(
+    sortFamilyCoursesForHome(courses).map((c) => c.daysUntilTrip),
+    [-1, -7, -30],
+  )
+})
+
+test('sorts a mixed list into upcoming (ascending) then past (most recent first)', () => {
+  const courses = [
+    stubCourse(1, -30),
+    stubCourse(2, 10),
+    stubCourse(3, -2),
+    stubCourse(4, 0),
+    stubCourse(5, 3),
+  ]
+
+  assert.deepEqual(
+    sortFamilyCoursesForHome(courses).map((c) => c.daysUntilTrip),
+    [0, 3, 10, -2, -30],
+  )
+})
+
+test('keeps alternativeCandidates attached to their own course after sorting', () => {
+  const courses = [stubCourse(1, -30), stubCourse(2, 10)]
+
+  const sorted = sortFamilyCoursesForHome(courses)
+
+  assert.deepEqual(
+    sorted.map((c) => [c.courseId, c.alternativeCandidates[0].candidateId]),
+    [
+      [2, 200],
+      [1, 100],
+    ],
+  )
+})
+
+test('does not mutate the original array or its course objects', () => {
+  const courses = [stubCourse(1, -30), stubCourse(2, 10)]
+  const original = [...courses]
+
+  sortFamilyCoursesForHome(courses)
+
+  assert.deepEqual(courses, original)
 })
