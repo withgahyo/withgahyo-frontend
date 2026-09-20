@@ -9,6 +9,7 @@ interface OnboardingPreferenceSectionProps {
   selectedIds: number[]
   onToggle: (id: number) => void
   onRetry: () => void
+  getImage: (code: string) => string | undefined
 }
 
 function OnboardingPreferenceSection({
@@ -19,6 +20,7 @@ function OnboardingPreferenceSection({
   selectedIds,
   onToggle,
   onRetry,
+  getImage,
 }: OnboardingPreferenceSectionProps) {
   if (isLoading) {
     return (
@@ -62,6 +64,7 @@ function OnboardingPreferenceSection({
       options={options}
       selectedIds={selectedIds}
       onToggle={onToggle}
+      getImage={getImage}
     />
   )
 }
