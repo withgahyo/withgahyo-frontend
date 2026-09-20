@@ -35,7 +35,7 @@ export async function createCourseGeneration(
   const response = await apiClient.post<BackendApiResponse<CreateCourseGenerationResponse>>(
     `/api/v1/courses/${courseId}/generations`,
     request,
-    { timeout: 60_000 },
+    { timeout: 180_000 },
   )
 
   return unwrapApiResponse(response.data)

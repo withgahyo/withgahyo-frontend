@@ -58,6 +58,7 @@ function CourseCreatePage() {
   const [isFamilySheetOpen, setIsFamilySheetOpen] = useState(false)
   const [familyEmail, setFamilyEmail] = useState('')
   const [familyRelationship, setFamilyRelationship] = useState('부모')
+  const [generationStep, setGenerationStep] = useState<'creating' | 'connecting'>('creating')
 
   const regionsQuery = useQuery({
     queryKey: queryKeys.courseRegions,
@@ -91,6 +92,7 @@ function CourseCreatePage() {
   const generateCourseMutation = useMutation({
     mutationFn: async (request: CreateCourseRequest) => {
       const course = await createCourse(request)
+      setGenerationStep('connecting')
       const generation = await createCourseGeneration(course.courseId)
       return { courseId: course.courseId, generationId: generation.generationId }
     },
@@ -193,6 +195,7 @@ function CourseCreatePage() {
   const handleGenerate = () => {
     if (!isFormValid || !form.region || !form.startDate || !form.endDate) return
     if (generateCourseMutation.isPending) return
+    setGenerationStep('creating')
 
     generateCourseMutation.mutate({
       title: form.courseName,
@@ -237,9 +240,19 @@ function CourseCreatePage() {
   if (generateCourseMutation.isPending) {
     return (
       <BrandLoadingScreen
-        message="여행 코스를 준비하고 있어요"
-        description="입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있어요."
-        srMessage="입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있습니다"
+        message={
+          generationStep === 'connecting' ? 'AI 서버를 준비하고 있어요' : '여행 코스를 준비하고 있어요'
+        }
+        description={
+          generationStep === 'connecting'
+            ? '서버 연결 후 맞춤 코스를 만들고 있어요. 잠시만 기다려주세요.'
+            : '입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있어요.'
+        }
+        srMessage={
+          generationStep === 'connecting'
+            ? 'AI 서버에 연결해 맞춤 코스를 만들고 있습니다'
+            : '입력한 여행 정보를 바탕으로 맞춤 코스를 준비하고 있습니다'
+        }
       >
         <CourseGenerationTips />
       </BrandLoadingScreen>
