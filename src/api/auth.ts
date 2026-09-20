@@ -40,6 +40,7 @@ export async function loginWithKakao(request: SocialLoginRequest) {
   const response = await apiClient.post<BackendApiResponse<AuthTokenResponse>>(
     '/api/v1/auth/login/kakao',
     request,
+    { timeout: 240_000 },
   )
 
   return unwrapApiResponse(response.data)
@@ -49,6 +50,7 @@ export async function loginWithGoogle(request: SocialLoginRequest) {
   const response = await apiClient.post<BackendApiResponse<AuthTokenResponse>>(
     '/api/v1/auth/login/google',
     request,
+    { timeout: 240_000 },
   )
 
   return unwrapApiResponse(response.data)
