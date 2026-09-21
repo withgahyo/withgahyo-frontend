@@ -22,6 +22,10 @@ import {
   useTourismPreferenceOptions,
   useUpdateOnboardingMutation,
 } from '../../features/onboarding/hooks/useOnboardingQueries'
+import {
+  getFoodPreferenceImage,
+  getTourismPreferenceImage,
+} from '../../features/onboarding/utils/preferenceImages'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 
 type Step = 1 | 2 | 3
@@ -265,6 +269,7 @@ function TravelPreferenceEditPage() {
                 onRetry={() => {
                   void tourismOptionsQuery.refetch()
                 }}
+                getImage={getTourismPreferenceImage}
               />
             </div>
           </>
@@ -288,6 +293,7 @@ function TravelPreferenceEditPage() {
                 onRetry={() => {
                   void foodOptionsQuery.refetch()
                 }}
+                getImage={getFoodPreferenceImage}
               />
             </div>
           </>

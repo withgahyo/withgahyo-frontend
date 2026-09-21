@@ -4,6 +4,7 @@ import OnboardingHeading from '../../features/onboarding/components/OnboardingHe
 import OnboardingPreferenceSection from '../../features/onboarding/components/OnboardingPreferenceSection'
 import OnboardingStepLayout from '../../features/onboarding/components/OnboardingStepLayout'
 import { useTourismPreferenceOptions } from '../../features/onboarding/hooks/useOnboardingQueries'
+import { getTourismPreferenceImage } from '../../features/onboarding/utils/preferenceImages'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 import { useOnboardingStore } from '../../stores/onboardingStore'
 
@@ -50,6 +51,7 @@ function OnboardingTourismPage() {
           onRetry={() => {
             void refetch()
           }}
+          getImage={getTourismPreferenceImage}
         />
       </div>
     </OnboardingStepLayout>

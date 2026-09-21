@@ -13,7 +13,7 @@ export const ROUTE_PATHS = {
   community: '/community',
   communityWithTab: (tab: string) => `/community?tab=${tab}`,
   popular: '/popular',
-  albums: '/albums',
+  weather: '/weather',
   mypage: '/mypage',
   mypageProfile: '/mypage/profile',
   mypagePreferences: '/mypage/preferences',
@@ -31,7 +31,6 @@ export const ROUTE_PATHS = {
     `/courses/${courseId}/recommendations/${generationId}/candidates/${candidateId}`,
   courseDetail: (courseId: string) => `/courses/${courseId}`,
 
-  albumDetail: (albumId: string) => `/albums/${albumId}`,
   communityPost: (postId: string | number) => `/community/${postId}`,
   notifications: '/notifications',
   review: (courseId: string) => `/reviews/${courseId}`,

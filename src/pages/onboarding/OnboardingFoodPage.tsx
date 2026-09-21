@@ -5,6 +5,7 @@ import OnboardingHeading from '../../features/onboarding/components/OnboardingHe
 import OnboardingPreferenceSection from '../../features/onboarding/components/OnboardingPreferenceSection'
 import OnboardingStepLayout from '../../features/onboarding/components/OnboardingStepLayout'
 import { useFoodPreferenceOptions } from '../../features/onboarding/hooks/useOnboardingQueries'
+import { getFoodPreferenceImage } from '../../features/onboarding/utils/preferenceImages'
 import { ROUTE_PATHS } from '../../routes/routePaths'
 import { useOnboardingStore } from '../../stores/onboardingStore'
 
@@ -64,6 +65,7 @@ function OnboardingFoodPage() {
           onRetry={() => {
             void refetch()
           }}
+          getImage={getFoodPreferenceImage}
         />
       </div>
     </OnboardingStepLayout>
