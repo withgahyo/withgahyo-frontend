@@ -14,6 +14,8 @@ export const queryKeys = {
 
   notifications: ['notifications'] as const,
 
+  weatherUpcoming: ['weather', 'upcoming'] as const,
+
   onboarding: ['onboarding'] as const,
   onboardingTourismOptions: ['onboarding', 'tourism-options'] as const,
   onboardingFoodOptions: ['onboarding', 'food-options'] as const,
@@ -30,5 +32,4 @@ export const queryKeys = {
   courseKeywords: ['course', 'keywords'] as const,
   courseFamilyMembers: ['course', 'family-members'] as const,
 
-  album: (albumId: number) => ['albums', albumId] as const,
 }

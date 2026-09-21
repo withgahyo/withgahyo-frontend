@@ -17,8 +17,7 @@ import HomePage from '../pages/home/HomePage'
 import CommunityPage from '../pages/community/CommunityPage'
 import CommunityDetailPage from '../pages/community/CommunityDetailPage'
 import PopularPage from '../pages/popular/PopularPage'
-import AlbumsPage from '../pages/albums/AlbumsPage'
-import AlbumDetailPage from '../pages/albums/AlbumDetailPage'
+import WeatherPage from '../pages/weather/WeatherPage'
 import MyPage from '../pages/mypage/MyPage'
 import ProfileEditPage from '../pages/mypage/ProfileEditPage'
 import SupportChatPage from '../pages/mypage/SupportChatPage'
@@ -68,7 +67,7 @@ export const router = createBrowserRouter([
               { path: ROUTE_PATHS.home, element: <HomePage /> },
               { path: ROUTE_PATHS.community, element: <CommunityPage /> },
               { path: ROUTE_PATHS.popular, element: <PopularPage /> },
-              { path: ROUTE_PATHS.albums, element: <AlbumsPage /> },
+              { path: ROUTE_PATHS.weather, element: <WeatherPage /> },
               { path: ROUTE_PATHS.mypage, element: <MyPage /> },
             ],
           },
@@ -116,7 +115,6 @@ export const router = createBrowserRouter([
               },
               { path: '/courses/:courseId', element: <CourseDetailPage /> },
 
-              { path: '/albums/:albumId', element: <AlbumDetailPage /> },
               { path: ROUTE_PATHS.notifications, element: <NotificationPage /> },
               { path: '/community/:postId', element: <CommunityDetailPage /> },
               { path: ROUTE_PATHS.mypageProfile, element: <ProfileEditPage /> },
